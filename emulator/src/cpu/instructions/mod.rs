@@ -63,4 +63,7 @@ enum Instruction {
     INY,
     DEX,
     DEY,
+
+    TXS,
+    TSX,
 }
