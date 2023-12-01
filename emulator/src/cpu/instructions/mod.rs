@@ -33,4 +33,14 @@ enum Instruction {
     SEC,
     SED,
     SEI,
+
+    //// JUMP ////
+    JMP,
+    JSR,
+    RTI,
+    RTS,
+
+    //// MATH ////
+    ADC,
+    SBC,
 }
