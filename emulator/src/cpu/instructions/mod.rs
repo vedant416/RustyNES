@@ -24,4 +24,13 @@ enum Instruction {
     CPX,
     CPY,
     BIT,
+
+    //// FLAG ////
+    CLC,
+    CLD,
+    CLI,
+    CLV,
+    SEC,
+    SED,
+    SEI,
 }
