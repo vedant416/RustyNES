@@ -66,4 +66,14 @@ enum Instruction {
 
     TXS,
     TSX,
+
+    //// STACK ////
+    PHA,
+    PHP,
+    PLA,
+    PLP,
+    
+    //// OTHER ////
+    BRK,
+    NOP,
 }
