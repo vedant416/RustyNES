@@ -53,4 +53,14 @@ enum Instruction {
     STY,
     INC,
     DEC,
+
+    //// REGISTER ////
+    TAX,
+    TAY,
+    TXA,
+    TYA,
+    INX,
+    INY,
+    DEX,
+    DEY,
 }
