@@ -1,11 +1,11 @@
 mod instructions;
-#[allow(dead_code)]  // todo: remove this
+#[allow(dead_code)] // todo: remove this
 pub struct CPU {
-    a: u8, // Accumulator
-    x: u8, // X register
-    y: u8, // Y register 
+    a: u8,  // Accumulator
+    x: u8,  // X register
+    y: u8,  // Y register
     sp: u8, // Stack pointer
-    
+
     pc: u16, // Program counter
 
     // Status register flags
@@ -26,9 +26,9 @@ impl CPU {
             x: 0,
             y: 0,
             sp: 0,
-            
+
             pc: 0,
-            
+
             c: false,
             z: false,
             i: false,
@@ -38,5 +38,18 @@ impl CPU {
             v: false,
             n: false,
         }
+    }
+
+    pub fn step(&mut self) -> usize {
+        todo!()
+        // handle early return due to dma
+        // handle interrupts
+        // record cycle before executing instruction
+        // fetch instruction
+        // decode instruction
+        // fetch address of operand and addressing mode
+        // update pc and cycles
+        // execute instruction(address, addressing mode)
+        // return cycles taken (current cycle - recorded cycle)
     }
 }
