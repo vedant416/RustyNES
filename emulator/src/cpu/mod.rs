@@ -1,3 +1,5 @@
+mod instructions;
+#[allow(dead_code)]  // todo: remove this
 pub struct CPU {
     a: u8, // Accumulator
     x: u8, // X register
