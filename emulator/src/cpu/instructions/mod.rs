@@ -43,4 +43,14 @@ enum Instruction {
     //// MATH ////
     ADC,
     SBC,
+
+    //// MEMORY ////
+    LDA,
+    LDX,
+    LDY,
+    STA,
+    STX,
+    STY,
+    INC,
+    DEC,
 }
