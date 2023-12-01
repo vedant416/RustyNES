@@ -76,4 +76,25 @@ enum Instruction {
     //// OTHER ////
     BRK,
     NOP,
+
+    //// ILLEGAL ////
+    AHX,
+    ALR,
+    ANC,
+    ARR,
+    AXS,
+    DCP,
+    ISB,
+    JAM,
+    LAS,
+    LAX,
+    RLA,
+    RRA,
+    SAX,
+    SHX,
+    SHY,
+    SLO,
+    SRE,
+    TAS,
+    XAA,
 }
