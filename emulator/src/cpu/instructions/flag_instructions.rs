@@ -26,8 +26,4 @@ impl super::CPU {
     pub fn sei(&mut self) {
         self.i = true;
     }
-
-    pub fn sev(&mut self) {
-        self.v = true;
-    }
 }
