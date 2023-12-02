@@ -120,11 +120,28 @@ impl Instruction {
 // utils for instructions
 impl CPU {
     ///// IO utils //////////////////////////////
-    pub fn read(&mut self, addr: u16) -> u8 {
+    fn read(&mut self, addr: u16) -> u8 {
         todo!("read");
     }
 
-    pub fn write(&mut self, addr: u16, val: u8) {
+    fn write(&mut self, addr: u16, val: u8) {
         todo!("write");
+    }
+
+    ///// Stack utils ///////////////////////////
+    fn pull_8(&mut self) -> u8 {
+        todo!("pull_8");
+    }
+
+    fn pull_16(&mut self) -> u16 {
+        todo!("pull_16");
+    }
+
+    fn push_8(&mut self, val: u8) {
+        todo!("push_8");
+    }
+
+    fn push_16(&mut self, val: u16) {
+        todo!("push_16");
     }
 }
