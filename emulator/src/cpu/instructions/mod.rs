@@ -1,6 +1,6 @@
 use super::CPU;
 mod flag_instructions;
-
+mod register_instructions;
 enum Instruction {
     //// BITWISE ////
     AND,
@@ -152,5 +152,9 @@ impl CPU {
 
     fn set_flags(&mut self, flags: u8) {
         todo!("set_flags");
+    }
+
+    fn update_zn_flags(&mut self, val: u8) {
+        todo!("update_zn_flags");
     }
 }
