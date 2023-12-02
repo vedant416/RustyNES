@@ -1,4 +1,3 @@
-#[allow(dead_code)]
 enum Instruction {
     //// BITWISE ////
     AND,
@@ -100,7 +99,6 @@ enum Instruction {
 }
 
 impl Instruction {
-    #[allow(dead_code)]
     pub fn execute(&self, cpu: &mut CPU) {
         match *self {
             //// FLAG ////
