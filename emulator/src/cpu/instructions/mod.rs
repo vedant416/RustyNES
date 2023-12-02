@@ -104,6 +104,12 @@ enum Instruction {
 impl Instruction {
     pub fn execute(&self, cpu: &mut CPU) {
         match *self {
+            //// BITWISE ////
+            
+            //// BRANCH ////
+            
+            //// COMPARE ////
+            
             //// FLAG ////
             Instruction::CLC => cpu.clc(),
             Instruction::CLD => cpu.cld(),
@@ -112,6 +118,20 @@ impl Instruction {
             Instruction::SEC => cpu.sec(),
             Instruction::SED => cpu.sed(),
             Instruction::SEI => cpu.sei(),
+            
+            //// JUMP ////
+            
+            //// MATH //// 
+            
+            //// MEMORY ////
+            
+            //// REGISTER //// 
+            
+            //// STACK ////
+            
+            //// OTHER ////
+            
+            //// ILLEGAL ////
             _ => println!("Not implemented yet"),
         }
     }
