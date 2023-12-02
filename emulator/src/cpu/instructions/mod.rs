@@ -144,4 +144,13 @@ impl CPU {
     fn push_16(&mut self, val: u16) {
         todo!("push_16");
     }
+
+    ///// Status flag update utils //////////////
+    fn get_flags(&self) -> u8 {
+        todo!("get_flags");
+    }
+
+    fn set_flags(&mut self, flags: u8) {
+        todo!("set_flags");
+    }
 }
