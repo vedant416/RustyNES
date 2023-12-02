@@ -1,3 +1,6 @@
+use super::CPU;
+mod flag_instructions;
+
 enum Instruction {
     //// BITWISE ////
     AND,
@@ -114,5 +117,14 @@ impl Instruction {
     }
 }
 
-use super::CPU;
-mod flag_instructions;
+// utils for instructions
+impl CPU {
+    ///// IO utils //////////////////////////////
+    pub fn read(&mut self, addr: u16) -> u8 {
+        todo!("read");
+    }
+
+    pub fn write(&mut self, addr: u16, val: u8) {
+        todo!("write");
+    }
+}
