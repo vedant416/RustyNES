@@ -65,7 +65,6 @@ enum Instruction {
     INY,
     DEX,
     DEY,
-
     TXS,
     TSX,
 
@@ -105,11 +104,11 @@ impl Instruction {
     pub fn execute(&self, cpu: &mut CPU) {
         match *self {
             //// BITWISE ////
-            
+
             //// BRANCH ////
-            
+
             //// COMPARE ////
-            
+
             //// FLAG ////
             Instruction::CLC => cpu.clc(),
             Instruction::CLD => cpu.cld(),
@@ -118,19 +117,29 @@ impl Instruction {
             Instruction::SEC => cpu.sec(),
             Instruction::SED => cpu.sed(),
             Instruction::SEI => cpu.sei(),
-            
+
             //// JUMP ////
-            
-            //// MATH //// 
-            
+
+            //// MATH ////
+
             //// MEMORY ////
-            
-            //// REGISTER //// 
-            
+
+            //// REGISTER ////
+            Instruction::TAX => cpu.tax(),
+            Instruction::TAY => cpu.tay(),
+            Instruction::TXA => cpu.txa(),
+            Instruction::TYA => cpu.tya(),
+            Instruction::INX => cpu.inx(),
+            Instruction::INY => cpu.iny(),
+            Instruction::DEX => cpu.dex(),
+            Instruction::DEY => cpu.dey(),
+            Instruction::TXS => cpu.txs(),
+            Instruction::TSX => cpu.tsx(),
+
             //// STACK ////
-            
+
             //// OTHER ////
-            
+
             //// ILLEGAL ////
             _ => println!("Not implemented yet"),
         }
