@@ -72,7 +72,7 @@ enum Instruction {
     PHP,
     PLA,
     PLP,
-    
+
     //// OTHER ////
     BRK,
     NOP,
@@ -97,4 +97,13 @@ enum Instruction {
     SRE,
     TAS,
     XAA,
+}
+
+impl Instruction {
+    #[allow(dead_code)]
+    pub fn execute(&self) {
+        match *self {
+            _ => println!("Not implemented yet"),
+        }
+    }
 }
