@@ -107,3 +107,6 @@ impl Instruction {
         }
     }
 }
+
+use super::CPU;
+mod flag_instructions;
