@@ -141,6 +141,25 @@ impl Instruction {
             //// OTHER ////
 
             //// ILLEGAL ////
+            Instruction::AHX => (),
+            Instruction::ALR => (),
+            Instruction::ANC => (),
+            Instruction::ARR => (),
+            Instruction::AXS => (),
+            Instruction::DCP => (),
+            Instruction::ISB => (),
+            Instruction::JAM => (),
+            Instruction::LAS => (),
+            Instruction::LAX => (),
+            Instruction::RLA => (),
+            Instruction::RRA => (),
+            Instruction::SAX => (),
+            Instruction::SHX => (),
+            Instruction::SHY => (),
+            Instruction::SLO => (),
+            Instruction::SRE => (),
+            Instruction::TAS => (),
+            Instruction::XAA => (),
             _ => println!("Not implemented yet"),
         }
     }
