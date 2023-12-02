@@ -101,8 +101,16 @@ enum Instruction {
 
 impl Instruction {
     #[allow(dead_code)]
-    pub fn execute(&self) {
+    pub fn execute(&self, cpu: &mut CPU) {
         match *self {
+            //// FLAG ////
+            Instruction::CLC => cpu.clc(),
+            Instruction::CLD => cpu.cld(),
+            Instruction::CLI => cpu.cli(),
+            Instruction::CLV => cpu.clv(),
+            Instruction::SEC => cpu.sec(),
+            Instruction::SED => cpu.sed(),
+            Instruction::SEI => cpu.sei(),
             _ => println!("Not implemented yet"),
         }
     }
