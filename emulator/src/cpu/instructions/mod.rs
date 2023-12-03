@@ -1,4 +1,5 @@
 use super::CPU;
+mod branch_instructions;
 mod flag_instructions;
 mod memory_instructions;
 mod register_instructions;
@@ -107,8 +108,17 @@ impl Instruction {
             //// BITWISE ////
 
             //// BRANCH ////
-
+            Instruction::BPL => cpu.bpl(addr),
+            Instruction::BMI => cpu.bmi(addr),
+            Instruction::BVC => cpu.bvc(addr),
+            Instruction::BVS => cpu.bvs(addr),
+            Instruction::BCC => cpu.bcc(addr),
+            Instruction::BCS => cpu.bcs(addr),
+            Instruction::BNE => cpu.bne(addr),
+            Instruction::BEQ => cpu.beq(addr),
+            
             //// COMPARE ////
+            
 
             //// FLAG ////
             Instruction::CLC => cpu.clc(),
