@@ -16,6 +16,9 @@ pub struct CPU {
     u: bool, // Unused flag (bit 5)
     v: bool, // Overflow (bit 6)
     n: bool, // Negative (bit 7)
+
+    // state
+    cycles: usize,
 }
 
 impl CPU {
@@ -36,6 +39,8 @@ impl CPU {
             u: false,
             v: false,
             n: false,
+
+            cycles: 0,
         }
     }
 
