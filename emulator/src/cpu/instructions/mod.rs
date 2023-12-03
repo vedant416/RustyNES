@@ -1,5 +1,6 @@
 use super::CPU;
 mod flag_instructions;
+mod memory_instructions;
 mod register_instructions;
 enum Instruction {
     //// BITWISE ////
@@ -101,7 +102,7 @@ enum Instruction {
 }
 
 impl Instruction {
-    pub fn execute(&self, cpu: &mut CPU) {
+    pub fn execute(&self, cpu: &mut CPU, addr: u16) {
         match *self {
             //// BITWISE ////
 
@@ -123,6 +124,15 @@ impl Instruction {
             //// MATH ////
 
             //// MEMORY ////
+            Instruction::LDA => cpu.lda(addr),
+            Instruction::LDX => cpu.ldx(addr),
+            Instruction::LDY => cpu.ldy(addr),
+            Instruction::STA => cpu.sta(addr),
+            Instruction::STX => cpu.stx(addr),
+            Instruction::STY => cpu.sty(addr),
+            Instruction::INC => cpu.inc(addr),
+            Instruction::DEC => cpu.dec(addr),
+
 
             //// REGISTER ////
             Instruction::TAX => cpu.tax(),
