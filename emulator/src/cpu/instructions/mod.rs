@@ -1,8 +1,11 @@
 use super::CPU;
+
 mod branch_instructions;
+mod compare_instructions;
 mod flag_instructions;
 mod memory_instructions;
 mod register_instructions;
+
 enum Instruction {
     //// BITWISE ////
     AND,
@@ -116,9 +119,12 @@ impl Instruction {
             Instruction::BCS => cpu.bcs(addr),
             Instruction::BNE => cpu.bne(addr),
             Instruction::BEQ => cpu.beq(addr),
-            
+
             //// COMPARE ////
-            
+            Instruction::CMP => cpu.cmp(addr),
+            Instruction::CPX => cpu.cpx(addr),
+            Instruction::CPY => cpu.cpy(addr),
+            Instruction::BIT => cpu.bit(addr),
 
             //// FLAG ////
             Instruction::CLC => cpu.clc(),
@@ -142,7 +148,6 @@ impl Instruction {
             Instruction::STY => cpu.sty(addr),
             Instruction::INC => cpu.inc(addr),
             Instruction::DEC => cpu.dec(addr),
-
 
             //// REGISTER ////
             Instruction::TAX => cpu.tax(),
