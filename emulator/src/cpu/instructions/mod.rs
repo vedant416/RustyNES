@@ -137,6 +137,11 @@ impl Instruction {
             Instruction::SEI => cpu.sei(),
 
             //// JUMP ////
+            Instruction::JMP => cpu.jmp(addr),
+            Instruction::JSR => cpu.jsr(addr),
+            Instruction::RTI => cpu.rti(),
+            Instruction::RTS => cpu.rts(),
+            
 
             //// MATH ////
 
