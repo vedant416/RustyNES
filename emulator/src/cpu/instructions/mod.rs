@@ -3,6 +3,7 @@ use super::CPU;
 mod branch_instructions;
 mod compare_instructions;
 mod flag_instructions;
+mod jump_instructions;
 mod memory_instructions;
 mod register_instructions;
 
