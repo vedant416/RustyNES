@@ -7,6 +7,7 @@ mod jump_instructions;
 mod math_instructions;
 mod memory_instructions;
 mod register_instructions;
+mod stack_instructions;
 
 enum Instruction {
     //// BITWISE ////
@@ -171,9 +172,14 @@ impl Instruction {
             Instruction::TSX => cpu.tsx(),
 
             //// STACK ////
+            Instruction::PHA => cpu.pha(),
+            Instruction::PHP => cpu.php(),
+            Instruction::PLA => cpu.pla(),
+            Instruction::PLP => cpu.plp(),
 
             //// OTHER ////
-
+            Instruction::NOP => (),
+            
             //// ILLEGAL ////
             Instruction::AHX => (),
             Instruction::ALR => (),
