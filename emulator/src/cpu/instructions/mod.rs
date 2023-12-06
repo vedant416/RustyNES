@@ -4,6 +4,7 @@ mod branch_instructions;
 mod compare_instructions;
 mod flag_instructions;
 mod jump_instructions;
+mod math_instructions;
 mod memory_instructions;
 mod register_instructions;
 
@@ -141,9 +142,11 @@ impl Instruction {
             Instruction::JSR => cpu.jsr(addr),
             Instruction::RTI => cpu.rti(),
             Instruction::RTS => cpu.rts(),
-            
+
 
             //// MATH ////
+            Instruction::ADC => cpu.adc(addr),
+            Instruction::SBC => cpu.sbc(addr),
 
             //// MEMORY ////
             Instruction::LDA => cpu.lda(addr),
