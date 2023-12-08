@@ -153,11 +153,11 @@ impl Instruction {
             Instruction::JSR => cpu.jsr(addr),
             Instruction::RTI => cpu.rti(),
             Instruction::RTS => cpu.rts(),
-
+            
             //// MATH ////
             Instruction::ADC => cpu.adc(addr),
             Instruction::SBC => cpu.sbc(addr),
-
+            
             //// MEMORY ////
             Instruction::LDA => cpu.lda(addr),
             Instruction::LDX => cpu.ldx(addr),
@@ -167,7 +167,7 @@ impl Instruction {
             Instruction::STY => cpu.sty(addr),
             Instruction::INC => cpu.inc(addr),
             Instruction::DEC => cpu.dec(addr),
-
+            
             //// REGISTER ////
             Instruction::TAX => cpu.tax(),
             Instruction::TAY => cpu.tay(),
@@ -179,16 +179,17 @@ impl Instruction {
             Instruction::DEY => cpu.dey(),
             Instruction::TXS => cpu.txs(),
             Instruction::TSX => cpu.tsx(),
-
+            
             //// STACK ////
             Instruction::PHA => cpu.pha(),
             Instruction::PHP => cpu.php(),
             Instruction::PLA => cpu.pla(),
             Instruction::PLP => cpu.plp(),
-
+            
             //// OTHER ////
             Instruction::NOP => (),
-
+            Instruction::BRK => cpu.brk(),
+            
             //// ILLEGAL ////
             Instruction::AHX => (),
             Instruction::ALR => (),
@@ -209,7 +210,6 @@ impl Instruction {
             Instruction::SRE => (),
             Instruction::TAS => (),
             Instruction::XAA => (),
-            _ => println!("Not implemented yet"),
         }
     }
 }
