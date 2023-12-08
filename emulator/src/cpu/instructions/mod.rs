@@ -1,5 +1,7 @@
+use super::AddressingMode;
 use super::CPU;
 
+mod bitwise_instructions;
 mod branch_instructions;
 mod compare_instructions;
 mod flag_instructions;
@@ -109,9 +111,17 @@ enum Instruction {
 }
 
 impl Instruction {
-    pub fn execute(&self, cpu: &mut CPU, addr: u16) {
+    pub fn execute(&self, cpu: &mut CPU, addr: u16, addr_mode: &AddressingMode) {
         match *self {
             //// BITWISE ////
+            Instruction::AND => cpu.and(addr),
+            Instruction::EOR => cpu.eor(addr),
+            Instruction::ORA => cpu.ora(addr),
+
+            Instruction::ASL => cpu.asl(addr, addr_mode),
+            Instruction::LSR => cpu.lsr(addr, addr_mode),
+            Instruction::ROL => cpu.rol(addr, addr_mode),
+            Instruction::ROR => cpu.ror(addr, addr_mode),
 
             //// BRANCH ////
             Instruction::BPL => cpu.bpl(addr),
@@ -143,7 +153,6 @@ impl Instruction {
             Instruction::JSR => cpu.jsr(addr),
             Instruction::RTI => cpu.rti(),
             Instruction::RTS => cpu.rts(),
-
 
             //// MATH ////
             Instruction::ADC => cpu.adc(addr),
@@ -179,7 +188,7 @@ impl Instruction {
 
             //// OTHER ////
             Instruction::NOP => (),
-            
+
             //// ILLEGAL ////
             Instruction::AHX => (),
             Instruction::ALR => (),
