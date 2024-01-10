@@ -1,3 +1,5 @@
+// mod rendering;
+
 pub struct PPU {
     dot: u16,  // 0-340
     line: u16, // 0-261, 0-239=visible, 240=post, 241-260=vblank, 261=pre
@@ -13,13 +15,15 @@ pub struct PPU {
     ppudata: u8,   // $2007
 
     // Loopy Registers
-    v: u16,    // Current VRAM address (15 bits)
-    t: u16,    // Temporary VRAM address (15 bits)
-    x: u8,     // Fine X scroll (3 bits)
-    w: bool,   // First or second write toggle (1 bit)
-    
+    v: u16,  // Current VRAM address (15 bits)
+    t: u16,  // Temporary VRAM address (15 bits)
+    x: u8,   // Fine X scroll (3 bits)
+    w: bool, // First or second write toggle (1 bit)
+
+    // frame stuff
     odd: bool, // odd frame flag
     frame_counter: u64,
+    frame_buffer: Box<[u8; 256 * 240 * 4]>,
 }
 
 impl PPU {
@@ -30,18 +34,68 @@ impl PPU {
 
 impl PPU {
     pub fn step(&mut self) {
-        // todo: implement rendering
+        // which line?
+        let visible_line = self.line < 240;
+        let preline = self.line == 261;
+        let fetch_line = visible_line || preline;
 
-        // todo: implement background data fetching
+        // which dot?
+        let visible_dot = self.dot >= 1 && self.dot <= 256;
+        let pre_fetch_dot = self.dot >= 321 && self.dot <= 336;
+        let fetch_dot = visible_dot || pre_fetch_dot;
 
-        // todo: implement sprite data fetching
+        let render_time = visible_line && visible_dot;
+        let fetch_time = fetch_line && fetch_dot;
 
-        // todo: implement vblank entering
+        let rendering_enabled = true; // todo!("Implement rendering_enabled");
 
-        // todo: implement vblank exiting
-        
-        // todo: implement nmi handling
-                              
-        // todo: implement increment dot, line and frame counters
+        if rendering_enabled {
+            if render_time {
+                todo!("Implement rendering")
+            }
+            if fetch_time {
+                todo!("Implement background data fetching")
+            }
+
+            ///// x-scroll, y-scroll (increment) and (reset) /////
+            if fetch_line {
+                if fetch_dot && self.dot & 7 == 0 {
+                    todo!("increment coarse x");
+                }
+
+                if self.dot == 256 {
+                    todo!("increment fine y");
+                }
+
+                if self.dot == 257 {
+                    todo!("reset coarse x");
+                }
+            }
+
+            if preline && self.dot >= 280 && self.dot <= 304 {
+                todo!("reset fine x");
+            }
+
+            if self.dot == 257 {
+                if visible_line {
+                    todo!("fetch sprites");
+                } else {
+                    todo!("clear sprite memory");
+                }
+            }
+        }
+
+        ////// enter and exit vblank //////
+        if self.line == 241 && self.dot == 1 {
+            todo!("Implement vblank entering")
+        }
+
+        if self.line == 261 && self.dot == 1 {
+            todo!("Implement vblank exiting")
+        }
+
+        ////// nmi handling //////
+
+        ////// dot, line and frame counters (increment) and (reset) //////
     }
 }
