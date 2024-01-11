@@ -60,7 +60,16 @@ impl PPU {
             ///// x-scroll, y-scroll (increment) and (reset) /////
             if fetch_line {
                 if fetch_dot && self.dot & 7 == 0 {
-                    todo!("increment coarse x");
+                    ///// increment coarse x //////
+                    
+                    // if coarse X == 31
+                    if self.v & 0x001F == 31 {
+                        self.v &= !0x001F; // coarse X = 0
+                        self.v ^= 0x0400;  // switch horizontal nametable
+                    } else {                
+                        self.v += 1;  // else: increment coarse X
+                    }
+                
                 }
 
                 if self.dot == 256 {
@@ -76,6 +85,7 @@ impl PPU {
                 todo!("reset fine x");
             }
 
+            ////// sprite evaluation //////
             if self.dot == 257 {
                 if visible_line {
                     todo!("fetch sprites");
