@@ -61,19 +61,34 @@ impl PPU {
             if fetch_line {
                 if fetch_dot && self.dot & 7 == 0 {
                     ///// increment coarse x //////
-                    
                     // if coarse X == 31
                     if self.v & 0x001F == 31 {
                         self.v &= !0x001F; // coarse X = 0
-                        self.v ^= 0x0400;  // switch horizontal nametable
-                    } else {                
-                        self.v += 1;  // else: increment coarse X
+                        self.v ^= 0x0400; // switch horizontal nametable
+                    } else {
+                        self.v += 1; // else: increment coarse X
                     }
-                
                 }
 
                 if self.dot == 256 {
-                    todo!("increment fine y");
+                    ////// increment fine y ///////
+                    // if fine Y < 7
+                    if self.v & 0x7000 != 0x7000 {
+                        self.v += 0x1000; // increment fine Y
+                    } else {
+                        self.v &= !0x7000; // fine Y = 0
+                        let mut y = (self.v & 0x03E0) >> 5; // let y = coarse Y
+                        if y == 29 {
+                            y = 0; // coarse Y = 0
+                            self.v ^= 0x0800; // switch vertical nametable
+                        } else if y == 31 {
+                            y = 0; // coarse Y = 0, nametable not switched
+                        } else {
+                            y += 1; // increment coarse Y
+                        }
+
+                        self.v = (self.v & !0x03E0) | (y << 5); // put coarse Y back into v
+                    }
                 }
 
                 if self.dot == 257 {
