@@ -92,12 +92,14 @@ impl PPU {
                 }
 
                 if self.dot == 257 {
-                    todo!("reset coarse x");
+                    ///// reset x bits //////
+                    self.v = (self.v & 0xFBE0) | (self.t & 0x041F);
                 }
             }
 
             if preline && self.dot >= 280 && self.dot <= 304 {
-                todo!("reset fine x");
+                ///// to "reset y bits" ///////
+                self.v = (self.v & 0x841F) | (self.t & 0x7BE0);
             }
 
             ////// sprite evaluation //////
