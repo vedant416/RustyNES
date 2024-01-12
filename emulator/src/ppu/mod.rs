@@ -20,6 +20,9 @@ pub struct PPU {
     x: u8,   // Fine X scroll (3 bits)
     w: bool, // First or second write toggle (1 bit)
 
+    // memory
+    frame_palette: [u8; 32],
+
     // frame stuff
     odd: bool, // odd frame flag
     frame_counter: u64,
@@ -50,73 +53,35 @@ impl PPU {
         let rendering_enabled = true; // todo!("Implement rendering_enabled");
 
         if rendering_enabled {
+            ///// render //////
             if render_time {
-                todo!("Implement rendering")
+                self.render();
             }
+            
+            ///// fetch background //////
             if fetch_time {
-                todo!("Implement background data fetching")
+                self.fetch_bg()
             }
 
             ///// x-scroll, y-scroll (increment) and (reset) /////
-            if fetch_line {
-                if fetch_dot && self.dot & 7 == 0 {
-                    ///// increment coarse x //////
-                    // if coarse X == 31
-                    if self.v & 0x001F == 31 {
-                        self.v &= !0x001F; // coarse X = 0
-                        self.v ^= 0x0400; // switch horizontal nametable
-                    } else {
-                        self.v += 1; // else: increment coarse X
-                    }
-                }
-
-                if self.dot == 256 {
-                    ////// increment fine y ///////
-                    // if fine Y < 7
-                    if self.v & 0x7000 != 0x7000 {
-                        self.v += 0x1000; // increment fine Y
-                    } else {
-                        self.v &= !0x7000; // fine Y = 0
-                        let mut y = (self.v & 0x03E0) >> 5; // let y = coarse Y
-                        if y == 29 {
-                            y = 0; // coarse Y = 0
-                            self.v ^= 0x0800; // switch vertical nametable
-                        } else if y == 31 {
-                            y = 0; // coarse Y = 0, nametable not switched
-                        } else {
-                            y += 1; // increment coarse Y
-                        }
-
-                        self.v = (self.v & !0x03E0) | (y << 5); // put coarse Y back into v
-                    }
-                }
-
-                if self.dot == 257 {
-                    ///// reset x bits //////
-                    self.v = (self.v & 0xFBE0) | (self.t & 0x041F);
-                }
-            }
-
-            if preline && self.dot >= 280 && self.dot <= 304 {
-                ///// to "reset y bits" ///////
-                self.v = (self.v & 0x841F) | (self.t & 0x7BE0);
-            }
+            self.increment_and_reset(fetch_line, fetch_dot, preline);
 
             ////// sprite evaluation //////
             if self.dot == 257 {
                 if visible_line {
-                    todo!("fetch sprites");
+                    self.fetch_sprites();
                 } else {
                     todo!("clear sprite memory");
                 }
             }
         }
 
-        ////// enter and exit vblank //////
+        ////// enter vblank //////
         if self.line == 241 && self.dot == 1 {
             todo!("Implement vblank entering")
         }
 
+        ////// exit vblank  //////
         if self.line == 261 && self.dot == 1 {
             todo!("Implement vblank exiting")
         }
@@ -147,5 +112,63 @@ impl PPU {
                 self.frame_counter += 1;
             }
         }
+    }
+
+    fn increment_and_reset(&mut self, fetch_line: bool, fetch_dot: bool, preline: bool) {
+        if fetch_line {
+            ///// increment coarse x //////
+            if fetch_dot && self.dot & 7 == 0 {
+                // if coarse X == 31
+                if self.v & 0x001F == 31 {
+                    self.v &= !0x001F; // coarse X = 0
+                    self.v ^= 0x0400; // switch horizontal nametable
+                } else {
+                    self.v += 1; // else: increment coarse X
+                }
+            }
+
+            ////// increment fine y ///////
+            if self.dot == 256 {
+                // if fine Y < 7
+                if self.v & 0x7000 != 0x7000 {
+                    self.v += 0x1000; // increment fine Y
+                } else {
+                    self.v &= !0x7000; // fine Y = 0
+                    let mut y = (self.v & 0x03E0) >> 5; // let y = coarse Y
+                    if y == 29 {
+                        y = 0; // coarse Y = 0
+                        self.v ^= 0x0800; // switch vertical nametable
+                    } else if y == 31 {
+                        y = 0; // coarse Y = 0, nametable not switched
+                    } else {
+                        y += 1; // increment coarse Y
+                    }
+
+                    self.v = (self.v & !0x03E0) | (y << 5); // put coarse Y back into v
+                }
+            }
+
+            ///// reset x bits //////
+            if self.dot == 257 {
+                self.v = (self.v & 0xFBE0) | (self.t & 0x041F);
+            }
+        }
+
+        ///// to "reset y bits" ///////
+        if preline && self.dot >= 280 && self.dot <= 304 {
+            self.v = (self.v & 0x841F) | (self.t & 0x7BE0);
+        }
+    }
+
+    pub fn render(&mut self) {
+        todo!("Implement PPU::render")
+    }
+
+    pub fn fetch_bg(&mut self) {
+        todo!("Implement PPU::fetch_bg")
+    }
+
+    pub fn fetch_sprites(&mut self) {
+        todo!("Implement PPU::fetch_sprites")
     }
 }
