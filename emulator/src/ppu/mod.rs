@@ -123,6 +123,29 @@ impl PPU {
 
         ////// nmi handling //////
 
+        
         ////// dot, line and frame counters (increment) and (reset) //////
+        if rendering_enabled && self.odd && self.line == 261 && self.dot == 339 {
+            // skip cycle 339 of pre-render scanline when odd frame
+            self.dot = 0;
+            self.line = 0;
+            self.odd = !self.odd;
+            self.frame_counter += 1;
+            return;
+        }
+
+        // increment dot, reset at 341
+        self.dot += 1;
+        if self.dot > 340 {
+            self.dot = 0;
+
+            // increment line, reset at 262
+            self.line += 1;
+            if self.line > 261 {
+                self.line = 0;
+                self.odd = !self.odd;
+                self.frame_counter += 1;
+            }
+        }
     }
 }
