@@ -30,7 +30,7 @@ pub struct PPU {
             shift_register size = 64 bits
     */
     shift_register: u64,
-
+    
     // memory
     frame_palette: [u8; 32],
 
@@ -38,6 +38,10 @@ pub struct PPU {
     odd: bool, // odd frame flag
     frame_counter: u64,
     frame_buffer: Box<[u8; 256 * 240 * 4]>,
+
+    // other ppu stuff
+    open_bus: u8,
+    data_buffer: u8,
 }
 
 impl PPU {
@@ -288,6 +292,75 @@ impl PPU {
     //// fetch_sprites ///////////////////////
     pub fn fetch_sprites(&mut self) {
         todo!("Implement PPU::fetch_sprites")
+    }
+}
+
+// read register
+impl PPU {
+    pub fn read_register(&mut self, addr: u16) -> u8 {
+        match addr {
+            0x2002 => self.read_status(),
+            0x2004 => self.read_oam_data(),
+            0x2007 => self.read_ppu_data(),
+            _ => unreachable!("invalid PPU register address"),
+        }
+    }
+
+    fn read_status(&self) -> u8 {
+        todo!()
+    }
+
+    fn read_oam_data(&self) -> u8 {
+        todo!()
+    }
+
+    fn read_ppu_data(&self) -> u8 {
+        todo!()
+    }
+}
+
+// write register
+impl PPU {
+    pub fn write_register(&mut self, addr: u16, data: u8) {
+        self.open_bus = data;
+        match addr {
+            0x2000 => self.write_ctrl(data),
+            0x2001 => self.write_mask(data),
+            0x2003 => self.write_oam_addr(data),
+            0x2004 => self.write_oam_data(data),
+            0x2005 => self.write_scroll(data),
+            0x2006 => self.write_ppu_addr(data),
+            0x2007 => self.write_ppu_data(data),
+            _ => unreachable!("invalid PPU register address"),
+        }
+    }
+
+    fn write_ctrl(&self, data: u8) {
+        todo!()
+    }
+
+    fn write_mask(&self, data: u8) {
+        todo!()
+    }
+
+    fn write_oam_addr(&self, data: u8) {
+        todo!()
+    }
+
+    fn write_oam_data(&self, data: u8) {
+        todo!()
+    }
+
+    fn write_scroll(&self, data: u8) {
+        todo!()
+    }
+
+    fn write_ppu_addr(&self, data: u8) {
+        todo!()
+    }
+
+    fn write_ppu_data(&self, data: u8) {
+        todo!()
     }
 }
 pub static SYSTEM_PALETTE: [(u8, u8, u8); 64] = [
