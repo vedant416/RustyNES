@@ -363,6 +363,7 @@ impl PPU {
         todo!()
     }
 }
+
 pub static SYSTEM_PALETTE: [(u8, u8, u8); 64] = [
     (0x80, 0x80, 0x80),
     (0x00, 0x3D, 0xA6),
