@@ -7,10 +7,10 @@ pub struct PPU {
     ppumask: u8,   // $2001
     ppustatus: u8, // $2002
     oamaddr: u8,   // $2003
-    oamdata: u8,   // $2004
+    // oamdata: u8,   // $2004
     ppuscroll: u8, // $2005
     ppuaddr: u8,   // $2006
-    ppudata: u8,   // $2007
+    // ppudata: u8,   // $2007
 
     // Loopy Registers
     v: u16,  // Current VRAM address (15 bits)
@@ -30,7 +30,7 @@ pub struct PPU {
             shift_register size = 64 bits
     */
     shift_register: u64,
-    
+
     // memory
     frame_palette: [u8; 32],
 
