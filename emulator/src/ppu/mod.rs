@@ -18,6 +18,7 @@ pub struct PPU {
     x: u8,   // Fine X scroll (3 bits)
     w: bool, // First or second write toggle (1 bit)
 
+    // shift register stuff
     /*
         pixel color is 4 bits:
             ( px = 4 bits )
@@ -30,11 +31,18 @@ pub struct PPU {
             shift_register size = 64 bits
     */
     shift_register: u64,
-
-    // memory
+    // latches to store fetched data before loading into shift register
+    nametable_latch: u8,
+    attribute_table_latch: u8,
+    pattern_table_low_latch: u8,
+    pattern_table_high_latch: u8,
+    
+    // ppu memory
+    vram : [u8; 0x2048],
     frame_palette: [u8; 32],
+    oam: [u8; 256],
 
-    // frame stuff
+    // frame management
     odd: bool, // odd frame flag
     frame_counter: u64,
     frame_buffer: Box<[u8; 256 * 240 * 4]>,
@@ -42,6 +50,11 @@ pub struct PPU {
     // other ppu stuff
     open_bus: u8,
     data_buffer: u8,
+
+    // nmi
+    nmi_previous_state: bool,
+    nmi_triggering_allowed: bool,
+    nmi_triggered: bool,
 }
 
 impl PPU {
