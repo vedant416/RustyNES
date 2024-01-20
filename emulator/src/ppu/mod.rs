@@ -290,11 +290,44 @@ impl PPU {
 
 // utils to extract info from ppu registers
 impl PPU {
-    /// ctrl bits
-    
+    /// ctrl bits ///
     pub fn genrate_nmi(&self) -> bool {
         self.ctrl & 0x80 != 0
     }
+
+    pub fn sprite_size(&self) -> u8 {
+        if (self.ctrl & 0x20) == 0 {
+            7
+        } else {
+            15
+        }
+    }
+
+    pub fn background_pt_addr(&self) -> u16 {
+        if self.ctrl & 0x10 == 0 {
+            0x0000
+        } else {
+            0x1000
+        }
+    }
+
+    pub fn sprite_pt_addr(&self) -> u16 {
+        if self.ctrl & 0x08 == 0 {
+            0x0000
+        } else {
+            0x1000
+        }
+    }
+
+    pub fn vram_addr_increment(&mut self) -> u16 {
+        if (self.ctrl & 0x04) == 0 {
+            1
+        } else {
+            32
+        }
+    }
+    
+   
 
     //// mask bits ////
     pub fn sp_rendering_allowed(&self) -> bool {
