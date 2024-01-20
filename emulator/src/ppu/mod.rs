@@ -3,13 +3,13 @@ pub struct PPU {
     line: u16, // 0-261, 0-239=visible, 240=post, 241-260=vblank, 261=pre
 
     // PPU Registers
-    ppuctrl: u8,   // $2000
-    ppumask: u8,   // $2001
-    ppustatus: u8, // $2002
-    oamaddr: u8,   // $2003
+    ctrl: u8,     // $2000
+    mask: u8,     // $2001
+    status: u8,   // $2002
+    oam_addr: u8, // $2003
     // oamdata: u8,   // $2004
-    ppuscroll: u8, // $2005
-    ppuaddr: u8,   // $2006
+    scroll: u8,    // $2005
+    vram_addr: u8, // $2006
     // ppudata: u8,   // $2007
 
     // Loopy Registers
@@ -36,9 +36,9 @@ pub struct PPU {
     attribute_table_latch: u8,
     pattern_table_low_latch: u8,
     pattern_table_high_latch: u8,
-    
+
     // ppu memory
-    vram : [u8; 0x2048],
+    vram: [u8; 0x2048],
     frame_palette: [u8; 32],
     oam: [u8; 256],
 
@@ -240,26 +240,6 @@ impl PPU {
         todo!();
     }
 
-    fn sp_rendering_allowed(&self) -> bool {
-        todo!();
-    }
-
-    fn bg_rendering_allowed(&self) -> bool {
-        todo!();
-    }
-
-    fn leftmost_sp_rendering_allowed(&self) -> bool {
-        todo!();
-    }
-
-    fn leftmost_bg_rendering_allowed(&self) -> bool {
-        todo!();
-    }
-
-    fn is_rendering_enabled(&self) -> bool {
-        self.bg_rendering_allowed() && self.sp_rendering_allowed()
-    }
-
     //// fetch background ///////////////////////
     pub fn fetch_bg(&mut self) {
         // before fetching:
@@ -306,6 +286,38 @@ impl PPU {
     pub fn fetch_sprites(&mut self) {
         todo!("Implement PPU::fetch_sprites")
     }
+}
+
+// utils to extract info from ppu registers
+impl PPU {
+    /// ctrl bits
+    
+    pub fn genrate_nmi(&self) -> bool {
+        self.ctrl & 0x80 != 0
+    }
+
+    //// mask bits ////
+    pub fn sp_rendering_allowed(&self) -> bool {
+        self.mask & 0x10 != 0
+    }
+
+    pub fn bg_rendering_allowed(&self) -> bool {
+        self.mask & 0x08 != 0
+    }
+
+    pub fn leftmost_sp_rendering_allowed(&self) -> bool {
+        self.mask & 0x04 != 0
+    }
+
+    pub fn leftmost_bg_rendering_allowed(&self) -> bool {
+        self.mask & 0x02 != 0
+    }
+
+    pub fn is_rendering_enabled(&self) -> bool {
+        self.bg_rendering_allowed() || self.sp_rendering_allowed()
+    }
+
+    // status register
 }
 
 // read register
