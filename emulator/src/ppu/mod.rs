@@ -350,7 +350,48 @@ impl PPU {
         self.bg_rendering_allowed() || self.sp_rendering_allowed()
     }
 
-    // status register
+    //// status register ////
+    // vblank flag
+    pub fn vblank_started(&self) -> bool {
+        // self.status.contains(Status::VBLANK_STARTED)
+        self.status & 0x80 != 0
+    }
+
+    pub fn set_vblank_started(&mut self) {
+        self.status |= 0x80;
+    }
+
+    pub fn clear_vblank_started(&mut self) {
+        self.status &= !0x80;
+    }
+
+    // sprite 0 hit
+    pub fn sprite_0_hit(&self) -> bool {
+        // self.status.contains(Status::SPRITE_0_HIT)
+        self.status & 0x40 != 0
+    }
+
+    pub fn set_sprite_0_hit(&mut self) {
+        self.status |= 0x40;
+    }
+
+    pub fn clear_sprite_0_hit(&mut self) {
+        self.status &= !0x40;
+    }
+
+    // sprite overflow
+    pub fn sprite_overflow(&self) -> bool {
+        // self.status.contains(Status::SPRITE_OVERFLOW)
+        self.status & 0x20 != 0
+    }
+
+    pub fn set_sprite_overflow(&mut self) {
+        self.status |= 0x20;
+    }
+
+    pub fn clear_sprite_overflow(&mut self) {
+        self.status &= !0x20;
+    }
 }
 
 // read register
