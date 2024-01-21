@@ -106,16 +106,23 @@ impl PPU {
 
         ////// enter vblank //////
         if self.line == 241 && self.dot == 1 {
-            todo!("Implement vblank entering")
+            self.set_vblank_started();
+            self.update_nmi_state();
         }
 
         ////// exit vblank  //////
         if self.line == 261 && self.dot == 1 {
-            todo!("Implement vblank exiting")
+            self.clear_vblank_started();
+            self.clear_sprite_0_hit();
+            self.clear_sprite_overflow();
+            self.update_nmi_state();
         }
 
         ////// nmi handling //////
-
+        if self.nmi_triggering_allowed && self.genrate_nmi() && self.vblank_started() {
+            self.nmi_triggered = true;
+            self.nmi_triggering_allowed = false;
+        }
         ////// dot, line and frame counters (increment) and (reset) //////
         if rendering_enabled && self.odd && self.line == 261 && self.dot == 339 {
             // skip cycle 339 of pre-render scanline when odd frame
@@ -269,6 +276,7 @@ impl PPU {
             _ => {}
         }
     }
+
     fn fetch_nt(&mut self) {
         todo!();
     }
@@ -285,6 +293,17 @@ impl PPU {
     //// fetch_sprites ///////////////////////
     pub fn fetch_sprites(&mut self) {
         todo!("Implement PPU::fetch_sprites")
+    }
+
+    //// nmi handling ///////////////////////
+    fn update_nmi_state(&mut self) {
+        let nmi_current_state = self.genrate_nmi() && self.vblank_started();
+
+        if !self.nmi_previous_state && nmi_current_state {
+            self.nmi_triggering_allowed = true;
+        }
+
+        self.nmi_previous_state = nmi_current_state;
     }
 }
 
@@ -326,8 +345,6 @@ impl PPU {
             32
         }
     }
-    
-   
 
     //// mask bits ////
     pub fn sp_rendering_allowed(&self) -> bool {
