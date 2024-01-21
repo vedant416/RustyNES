@@ -1,6 +1,6 @@
 pub mod nrom;
-use crate::rom::Cart;
+use crate::rom::CartData;
 pub trait Mapper {
-    fn read(&mut self, cart: &mut Cart, addr: u16) -> u8;
-    fn write(&mut self, cart: &mut Cart, addr: u16, val: u8);
+    fn read(&mut self, cart_data: &mut CartData, addr: u16) -> u8;
+    fn write(&mut self, cart_data: &mut CartData, addr: u16, val: u8);
 }

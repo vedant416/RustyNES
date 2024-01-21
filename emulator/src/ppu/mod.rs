@@ -1,3 +1,5 @@
+use crate::rom::Cart;
+
 pub struct PPU {
     dot: u16,  // 0-340
     line: u16, // 0-261, 0-239=visible, 240=post, 241-260=vblank, 261=pre
@@ -49,12 +51,15 @@ pub struct PPU {
 
     // other ppu stuff
     open_bus: u8,
-    data_buffer: u8,
+    data_latch: u8,
 
     // nmi
     nmi_previous_state: bool,
     nmi_triggering_allowed: bool,
     nmi_triggered: bool,
+
+    // cartridge
+    cart: Cart,
 }
 
 impl PPU {
@@ -307,6 +312,61 @@ impl PPU {
     }
 }
 
+// read/write ppu address space
+impl PPU {
+     ///// CHR ROM /////
+     pub fn read_chr(&mut self, addr: u16) -> u8 {
+        self.cart.mapper.read(&mut self.cart.data, addr)
+    }
+
+    pub fn write_chr(&mut self, addr: u16, data: u8) {
+        self.cart.mapper.write(&mut self.cart.data, addr, data)
+    }
+
+    pub fn read_chr_delayed(&mut self, addr: u16) -> u8 {
+        let res = self.data_latch;
+        self.data_latch = self.read_chr(addr);
+        res
+    }
+
+    ///// NAMETABLE /////
+    pub fn read_nametable(&self, addr: u16) -> u8 {
+        let addr = self.map_vram_addr(addr);
+        self.vram[addr as usize]
+    }
+
+    fn write_nametable(&mut self, addr: u16, data: u8) {
+        let addr = self.map_vram_addr(addr) as usize;
+        self.vram[addr] = data;
+    }
+
+    pub fn read_nametable_delayed(&mut self, addr: u16) -> u8 {
+        let res = self.data_latch;
+        self.data_latch = self.read_nametable(addr);
+        res
+    }
+
+    ///// PALETTE /////
+    fn write_palette(&mut self, addr: u16, data: u8) {
+        let addr = self.map_palette_addr(addr) as usize;
+        self.frame_palette[addr] = data;
+    }
+
+    fn read_palette(&mut self, addr: u16) -> u8 {
+        let addr = self.map_palette_addr(addr) as usize;
+        self.frame_palette[addr]
+    }
+
+    // handle mirroring
+    fn map_vram_addr(&self, addr: u16) -> u16 {
+        todo!();
+    }
+
+    fn map_palette_addr(&self, addr: u16) -> u16 {
+        todo!();
+    }
+
+}
 // utils to extract info from ppu registers
 impl PPU {
     /// ctrl bits ///
