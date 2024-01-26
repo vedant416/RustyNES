@@ -153,53 +153,7 @@ impl PPU {
         }
     }
 
-    fn increment_and_reset(&mut self, fetch_line: bool, fetch_dot: bool, preline: bool) {
-        if fetch_line {
-            ///// increment coarse x //////
-            if fetch_dot && self.dot & 7 == 0 {
-                // if coarse X == 31
-                if self.v & 0x001F == 31 {
-                    self.v &= !0x001F; // coarse X = 0
-                    self.v ^= 0x0400; // switch horizontal nametable
-                } else {
-                    self.v += 1; // else: increment coarse X
-                }
-            }
-
-            ////// increment fine y ///////
-            if self.dot == 256 {
-                // if fine Y < 7
-                if self.v & 0x7000 != 0x7000 {
-                    self.v += 0x1000; // increment fine Y
-                } else {
-                    self.v &= !0x7000; // fine Y = 0
-                    let mut y = (self.v & 0x03E0) >> 5; // let y = coarse Y
-                    if y == 29 {
-                        y = 0; // coarse Y = 0
-                        self.v ^= 0x0800; // switch vertical nametable
-                    } else if y == 31 {
-                        y = 0; // coarse Y = 0, nametable not switched
-                    } else {
-                        y += 1; // increment coarse Y
-                    }
-
-                    self.v = (self.v & !0x03E0) | (y << 5); // put coarse Y back into v
-                }
-            }
-
-            ///// reset x bits //////
-            if self.dot == 257 {
-                self.v = (self.v & 0xFBE0) | (self.t & 0x041F);
-            }
-        }
-
-        ///// to "reset y bits" ///////
-        if preline && self.dot >= 280 && self.dot <= 304 {
-            self.v = (self.v & 0x841F) | (self.t & 0x7BE0);
-        }
-    }
-
-    //// rendering /////////////////////////////
+    //// rendering ////////////////////////////////
     pub fn render(&mut self) {
         /*
         pixel is not generated on dot 1
@@ -252,7 +206,7 @@ impl PPU {
         todo!();
     }
 
-    //// fetch background ///////////////////////
+    //// fetch background //////////////////////////
     pub fn fetch_bg(&mut self) {
         // before fetching:
         // shift the shift register by size of one pixel (4 bits)
@@ -285,22 +239,27 @@ impl PPU {
     fn fetch_nt(&mut self) {
         todo!();
     }
+    
     fn fetch_at(&mut self) {
         todo!();
     }
+    
     fn fetch_pt(&mut self) {
         todo!();
     }
+    
     fn load_fetched_data(&mut self) {
         todo!();
     }
 
-    //// fetch_sprites ///////////////////////
+    
+    //// fetch_sprites ////////////////////////////
     pub fn fetch_sprites(&mut self) {
         todo!("Implement PPU::fetch_sprites")
     }
 
-    //// nmi handling ///////////////////////
+    
+    //// nmi handling /////////////////////////////
     fn update_nmi_state(&mut self) {
         let nmi_current_state = self.genrate_nmi() && self.vblank_started();
 
@@ -310,66 +269,175 @@ impl PPU {
 
         self.nmi_previous_state = nmi_current_state;
     }
+
+    
+    //// increment and reset //////////////////////
+    fn increment_and_reset(&mut self, fetch_line: bool, fetch_dot: bool, preline: bool) {
+        if fetch_line {
+            ///// increment coarse x //////
+            if fetch_dot && self.dot & 7 == 0 {
+                // if coarse X == 31
+                if self.v & 0x001F == 31 {
+                    self.v &= !0x001F; // coarse X = 0
+                    self.v ^= 0x0400; // switch horizontal nametable
+                } else {
+                    self.v += 1; // else: increment coarse X
+                }
+            }
+
+            ////// increment fine y ///////
+            if self.dot == 256 {
+                // if fine Y < 7
+                if self.v & 0x7000 != 0x7000 {
+                    self.v += 0x1000; // increment fine Y
+                } else {
+                    self.v &= !0x7000; // fine Y = 0
+                    let mut y = (self.v & 0x03E0) >> 5; // let y = coarse Y
+                    if y == 29 {
+                        y = 0; // coarse Y = 0
+                        self.v ^= 0x0800; // switch vertical nametable
+                    } else if y == 31 {
+                        y = 0; // coarse Y = 0, nametable not switched
+                    } else {
+                        y += 1; // increment coarse Y
+                    }
+
+                    self.v = (self.v & !0x03E0) | (y << 5); // put coarse Y back into v
+                }
+            }
+
+            ///// reset x bits //////
+            if self.dot == 257 {
+                self.v = (self.v & 0xFBE0) | (self.t & 0x041F);
+            }
+        }
+
+        ///// to "reset y bits" ///////
+        if preline && self.dot >= 280 && self.dot <= 304 {
+            self.v = (self.v & 0x841F) | (self.t & 0x7BE0);
+        }
+    }
 }
 
-// read/write ppu address space
+
+// read register
 impl PPU {
-     ///// CHR ROM /////
-     pub fn read_chr(&mut self, addr: u16) -> u8 {
-        self.cart.mapper.read(&mut self.cart.data, addr)
+    pub fn read_register(&mut self, addr: u16) -> u8 {
+        match addr {
+            0x2002 => self.read_status(),
+            0x2004 => self.read_oam_data(),
+            0x2007 => self.read_ppu_data(),
+            _ => unreachable!("invalid PPU register address"),
+        }
     }
 
-    pub fn write_chr(&mut self, addr: u16, data: u8) {
-        self.cart.mapper.write(&mut self.cart.data, addr, data)
-    }
-
-    pub fn read_chr_delayed(&mut self, addr: u16) -> u8 {
-        let res = self.data_latch;
-        self.data_latch = self.read_chr(addr);
+    fn read_status(&mut self) -> u8 {
+        let res = (self.status & 0b1110_0000) | (self.open_bus & 0b0001_1111);
+        self.w = false;
+        self.clear_vblank_started();
+        self.update_nmi_state();
         res
     }
 
-    ///// NAMETABLE /////
-    pub fn read_nametable(&self, addr: u16) -> u8 {
-        let addr = self.map_vram_addr(addr);
-        self.vram[addr as usize]
+    fn read_oam_data(&self) -> u8 {
+        self.oam[self.oam_addr as usize]
     }
 
-    fn write_nametable(&mut self, addr: u16, data: u8) {
-        let addr = self.map_vram_addr(addr) as usize;
-        self.vram[addr] = data;
-    }
-
-    pub fn read_nametable_delayed(&mut self, addr: u16) -> u8 {
-        let res = self.data_latch;
-        self.data_latch = self.read_nametable(addr);
+    fn read_ppu_data(&mut self) -> u8 {
+        let addr = self.v;
+        let res = match addr {
+            0x0000..=0x1fff => self.read_chr_delayed(addr),
+            0x2000..=0x3eff => self.read_nametable_delayed(addr),
+            0x3f00..=0x3fff => self.read_palette(addr),
+            _ => unreachable!(),
+        };
+        self.v = self.v.wrapping_add(self.vram_addr_increment()) & 0x3fff;
         res
     }
-
-    ///// PALETTE /////
-    fn write_palette(&mut self, addr: u16, data: u8) {
-        let addr = self.map_palette_addr(addr) as usize;
-        self.frame_palette[addr] = data;
-    }
-
-    fn read_palette(&mut self, addr: u16) -> u8 {
-        let addr = self.map_palette_addr(addr) as usize;
-        self.frame_palette[addr]
-    }
-
-    // handle mirroring
-    fn map_vram_addr(&self, addr: u16) -> u16 {
-        todo!();
-    }
-
-    fn map_palette_addr(&self, addr: u16) -> u16 {
-        todo!();
-    }
-
 }
+
+// write register
+impl PPU {
+    pub fn write_register(&mut self, addr: u16, data: u8) {
+        self.open_bus = data;
+        match addr {
+            0x2000 => self.write_ctrl(data),
+            0x2001 => self.write_mask(data),
+            0x2003 => self.write_oam_addr(data),
+            0x2004 => self.write_oam_data(data),
+            0x2005 => self.write_scroll(data),
+            0x2006 => self.write_ppu_addr(data),
+            0x2007 => self.write_ppu_data(data),
+            _ => println!("invalid PPU register address: 0x{:04X}", addr),
+        }
+    }
+
+    fn write_ctrl(&mut self, data: u8) {
+        self.ctrl = data;
+        self.t = (self.t & 0xF3FF) | (((data as u16) & 0b11) << 10);
+        self.update_nmi_state();
+    }
+
+    fn write_mask(&mut self, data: u8) {
+        self.mask = data;
+    }
+
+    fn write_oam_addr(&mut self, data: u8) {
+        self.oam_addr = data;
+    }
+
+    fn write_oam_data(&mut self, data: u8) {
+        self.oam[self.oam_addr as usize] = data;
+        self.oam_addr = self.oam_addr.wrapping_add(1);
+    }
+
+    fn write_scroll(&mut self, data: u8) {
+        if !self.w {
+            // t: ....... ...ABCDE <- d: ABCDE...
+            // x:              FGH <- d: .....FGH
+            // w:                  <- 1
+            self.t = (self.t & 0xFFE0) | ((data as u16) >> 3);
+            self.x = data & 0b111;
+            self.w = true;
+        } else {
+            // t: FGH..AB CDE..... <- d: ABCDEFGH
+            // w:                  <- 0
+            self.t = (self.t & 0x8FFF) | (((data as u16) & 0b111) << 12);
+            self.t = (self.t & 0xFC1F) | (((data as u16) & 0b11111000) << 2);
+            self.w = false;
+        }
+    }
+
+    fn write_ppu_addr(&mut self, data: u8) {
+        if !self.w {
+            self.t = (self.t & 0x80FF) | (((data as u16) & 0b111111) << 8);
+            self.t &= 0xBFFF;
+            self.w = true;
+        } else {
+            self.t = (self.t & 0xFF00) | (data as u16);
+            self.v = self.t;
+            self.w = false;
+        }
+    }
+
+    fn write_ppu_data(&mut self, data: u8) {
+        let addr = self.v;
+        match addr {
+            0x0000..=0x1fff => self.write_chr(addr, data),
+            0x2000..=0x3eff => self.write_nametable(addr, data),
+            0x3f00..=0x3fff => self.write_palette(addr, data),
+            _ => {
+                println!("invalid PPU address: 0x{:04X}", addr);
+            }
+        }
+
+        self.v = self.v.wrapping_add(self.vram_addr_increment()) & 0x3fff;
+    }
+}
+
 // utils to extract info from ppu registers
 impl PPU {
-    /// ctrl bits ///
+    // ctrl bits ////
     pub fn genrate_nmi(&self) -> bool {
         self.ctrl & 0x80 != 0
     }
@@ -406,7 +474,7 @@ impl PPU {
         }
     }
 
-    //// mask bits ////
+    // mask bits  ////
     pub fn sp_rendering_allowed(&self) -> bool {
         self.mask & 0x10 != 0
     }
@@ -427,7 +495,7 @@ impl PPU {
         self.bg_rendering_allowed() || self.sp_rendering_allowed()
     }
 
-    //// status register ////
+    // status bits ////
     // vblank flag
     pub fn vblank_started(&self) -> bool {
         // self.status.contains(Status::VBLANK_STARTED)
@@ -471,74 +539,61 @@ impl PPU {
     }
 }
 
-// read register
+// read/write ppu address space
 impl PPU {
-    pub fn read_register(&mut self, addr: u16) -> u8 {
-        match addr {
-            0x2002 => self.read_status(),
-            0x2004 => self.read_oam_data(),
-            0x2007 => self.read_ppu_data(),
-            _ => unreachable!("invalid PPU register address"),
-        }
+    // CHR ROM 
+    pub fn read_chr(&mut self, addr: u16) -> u8 {
+        self.cart.mapper.read(&mut self.cart.data, addr)
     }
 
-    fn read_status(&self) -> u8 {
-        todo!()
+    pub fn write_chr(&mut self, addr: u16, data: u8) {
+        self.cart.mapper.write(&mut self.cart.data, addr, data)
     }
 
-    fn read_oam_data(&self) -> u8 {
-        todo!()
+    pub fn read_chr_delayed(&mut self, addr: u16) -> u8 {
+        let res = self.data_latch;
+        self.data_latch = self.read_chr(addr);
+        res
     }
 
-    fn read_ppu_data(&self) -> u8 {
-        todo!()
+    // NAMETABLE 
+    pub fn read_nametable(&self, addr: u16) -> u8 {
+        let addr = self.map_vram_addr(addr);
+        self.vram[addr as usize]
+    }
+
+    fn write_nametable(&mut self, addr: u16, data: u8) {
+        let addr = self.map_vram_addr(addr) as usize;
+        self.vram[addr] = data;
+    }
+
+    pub fn read_nametable_delayed(&mut self, addr: u16) -> u8 {
+        let res = self.data_latch;
+        self.data_latch = self.read_nametable(addr);
+        res
+    }
+
+    // PALETTE 
+    fn write_palette(&mut self, addr: u16, data: u8) {
+        let addr = self.map_palette_addr(addr) as usize;
+        self.frame_palette[addr] = data;
+    }
+
+    fn read_palette(&mut self, addr: u16) -> u8 {
+        let addr = self.map_palette_addr(addr) as usize;
+        self.frame_palette[addr]
+    }
+
+    // Mirrorings
+    fn map_vram_addr(&self, addr: u16) -> u16 {
+        todo!();
+    }
+
+    fn map_palette_addr(&self, addr: u16) -> u16 {
+        todo!();
     }
 }
 
-// write register
-impl PPU {
-    pub fn write_register(&mut self, addr: u16, data: u8) {
-        self.open_bus = data;
-        match addr {
-            0x2000 => self.write_ctrl(data),
-            0x2001 => self.write_mask(data),
-            0x2003 => self.write_oam_addr(data),
-            0x2004 => self.write_oam_data(data),
-            0x2005 => self.write_scroll(data),
-            0x2006 => self.write_ppu_addr(data),
-            0x2007 => self.write_ppu_data(data),
-            _ => unreachable!("invalid PPU register address"),
-        }
-    }
-
-    fn write_ctrl(&self, data: u8) {
-        todo!()
-    }
-
-    fn write_mask(&self, data: u8) {
-        todo!()
-    }
-
-    fn write_oam_addr(&self, data: u8) {
-        todo!()
-    }
-
-    fn write_oam_data(&self, data: u8) {
-        todo!()
-    }
-
-    fn write_scroll(&self, data: u8) {
-        todo!()
-    }
-
-    fn write_ppu_addr(&self, data: u8) {
-        todo!()
-    }
-
-    fn write_ppu_data(&self, data: u8) {
-        todo!()
-    }
-}
 
 pub static SYSTEM_PALETTE: [(u8, u8, u8); 64] = [
     (0x80, 0x80, 0x80),
