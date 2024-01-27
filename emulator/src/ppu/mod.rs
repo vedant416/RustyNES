@@ -1,5 +1,7 @@
 use crate::rom::Cart;
-
+// mod render;
+// mod fetch;
+// mod io;
 pub struct PPU {
     dot: u16,  // 0-340
     line: u16, // 0-261, 0-239=visible, 240=post, 241-260=vblank, 261=pre
@@ -393,15 +395,10 @@ impl PPU {
 
     fn write_scroll(&mut self, data: u8) {
         if !self.w {
-            // t: ....... ...ABCDE <- d: ABCDE...
-            // x:              FGH <- d: .....FGH
-            // w:                  <- 1
             self.t = (self.t & 0xFFE0) | ((data as u16) >> 3);
             self.x = data & 0b111;
             self.w = true;
         } else {
-            // t: FGH..AB CDE..... <- d: ABCDEFGH
-            // w:                  <- 0
             self.t = (self.t & 0x8FFF) | (((data as u16) & 0b111) << 12);
             self.t = (self.t & 0xFC1F) | (((data as u16) & 0b11111000) << 2);
             self.w = false;
@@ -498,7 +495,6 @@ impl PPU {
     // status bits ////
     // vblank flag
     pub fn vblank_started(&self) -> bool {
-        // self.status.contains(Status::VBLANK_STARTED)
         self.status & 0x80 != 0
     }
 
@@ -512,7 +508,6 @@ impl PPU {
 
     // sprite 0 hit
     pub fn sprite_0_hit(&self) -> bool {
-        // self.status.contains(Status::SPRITE_0_HIT)
         self.status & 0x40 != 0
     }
 
@@ -526,7 +521,6 @@ impl PPU {
 
     // sprite overflow
     pub fn sprite_overflow(&self) -> bool {
-        // self.status.contains(Status::SPRITE_OVERFLOW)
         self.status & 0x20 != 0
     }
 
