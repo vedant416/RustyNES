@@ -1,7 +1,7 @@
 use crate::rom::Cart;
-mod render;
 mod fetch;
 mod io;
+mod render;
 pub struct PPU {
     dot: u16,  // 0-340
     line: u16, // 0-261, 0-239=visible, 240=post, 241-260=vblank, 261=pre
@@ -82,6 +82,7 @@ impl PPU {
         let pre_fetch_dot = self.dot >= 321 && self.dot <= 336;
         let fetch_dot = visible_dot || pre_fetch_dot;
 
+        // which time?
         let render_time = visible_line && visible_dot;
         let fetch_time = fetch_line && fetch_dot;
 
@@ -98,10 +99,10 @@ impl PPU {
                 self.fetch_bg()
             }
 
-            ///// x-scroll, y-scroll (increment) and (reset) /////
-            self.increment_and_reset(fetch_line, fetch_dot, preline);
+            ///// x-scroll/y-scroll increment and copy x/y component from "t" to "v" /////
+            self.increment_and_copy(fetch_line, fetch_dot, preline);
 
-            ////// sprite evaluation //////
+            ////// do sprite evaluation and fetching //////
             if self.dot == 257 {
                 if visible_line {
                     self.fetch_sprites();
@@ -130,7 +131,8 @@ impl PPU {
             self.nmi_triggered = true;
             self.nmi_triggering_allowed = false;
         }
-        ////// dot, line and frame counters (increment) and (reset) //////
+        
+        ////// dot, line and frame counters (increment) and (reset) and special case of (skipping) //////
         if rendering_enabled && self.odd && self.line == 261 && self.dot == 339 {
             // skip cycle 339 of pre-render scanline when odd frame
             self.dot = 0;
@@ -155,59 +157,6 @@ impl PPU {
         }
     }
 
-    //// rendering ////////////////////////////////
-    pub fn render(&mut self) {
-        /*
-        pixel is not generated on dot 1
-        which makes x-coord 1-indexed
-        subtract by 1 to make x-coord 0-indexed
-        */
-        let x = (self.dot - 1) as usize;
-        let y = self.line as usize;
-
-        ///// handle clipping //////
-        let mut render_sp = self.bg_rendering_allowed();
-        let mut render_bg = self.sp_rendering_allowed();
-        if x < 8 {
-            if !self.leftmost_bg_rendering_allowed() {
-                render_bg = false;
-            }
-            if !self.leftmost_sp_rendering_allowed() {
-                render_sp = false;
-            }
-        }
-
-        ///// get final color //////
-        let bg_color = if render_bg { self.get_bg_color() } else { None };
-        let sp_color = if render_sp { self.get_sp_color() } else { None };
-
-        let combined_color = match (bg_color, sp_color) {
-            (Some(bg), Some(sp)) => {
-                todo!("Implement sprite/background priority");
-            }
-            (Some(bg), None) => bg,
-            (None, Some(sp)) => sp,
-            (None, None) => (0, 0, 0),
-        };
-
-        ///// put final color in frame buffer //////
-        if x < 256 && y < 240 {
-            let offset = (y * 256 + x) * 4;
-            self.frame_buffer[offset] = combined_color.0;
-            self.frame_buffer[offset + 1] = combined_color.1;
-            self.frame_buffer[offset + 2] = combined_color.2;
-            self.frame_buffer[offset + 3] = 255;
-        }
-    }
-
-    fn get_bg_color(&self) -> Option<(u8, u8, u8)> {
-        todo!();
-    }
-
-    fn get_sp_color(&self) -> Option<(u8, u8, u8)> {
-        todo!();
-    }
-
     //// nmi handling /////////////////////////////
     fn update_nmi_state(&mut self) {
         let nmi_current_state = self.genrate_nmi() && self.vblank_started();
@@ -219,9 +168,8 @@ impl PPU {
         self.nmi_previous_state = nmi_current_state;
     }
 
-    
-    //// increment and reset //////////////////////
-    fn increment_and_reset(&mut self, fetch_line: bool, fetch_dot: bool, preline: bool) {
+    //// increment and copy //////////////////////
+    fn increment_and_copy(&mut self, fetch_line: bool, fetch_dot: bool, preline: bool) {
         if fetch_line {
             ///// increment coarse x //////
             if fetch_dot && self.dot & 7 == 0 {
@@ -255,13 +203,13 @@ impl PPU {
                 }
             }
 
-            ///// reset x bits //////
+            ///// copy x bits from t to v //////
             if self.dot == 257 {
                 self.v = (self.v & 0xFBE0) | (self.t & 0x041F);
             }
         }
 
-        ///// to "reset y bits" ///////
+        ///// copy y bits from t to v ///////
         if preline && self.dot >= 280 && self.dot <= 304 {
             self.v = (self.v & 0x841F) | (self.t & 0x7BE0);
         }
