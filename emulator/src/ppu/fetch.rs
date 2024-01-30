@@ -52,7 +52,22 @@ impl super::PPU {
     }
     
     fn load_fetched_data(&mut self) {
-        todo!();
+        let mut new_data: u32 = 0;
+        let attr = self.attribute_table_latch << 2;
+
+        for _ in 0..8 {
+            let p1 = (self.pattern_table_low_latch & (1 << 7)) >> 7;
+            let p2 = (self.pattern_table_high_latch & (1 << 7)) >> 6;
+            let pattern = p2 | p1;
+            
+            self.pattern_table_low_latch <<= 1;
+            self.pattern_table_high_latch <<= 1;
+            new_data <<= 4;
+            
+            new_data |= (attr | pattern) as u32;
+        }
+
+        self.shift_register |= new_data as u64;
     }
 
     
