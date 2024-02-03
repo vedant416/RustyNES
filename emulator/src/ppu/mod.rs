@@ -13,7 +13,7 @@ pub struct PPU {
     oam_addr: u8, // $2003
     // oamdata: u8,   // $2004
     scroll: u8,    // $2005
-    vram_addr: u8, // $2006
+    // vram_addr: u8, // $2006
     // ppudata: u8,   // $2007
 
     // Loopy Registers
@@ -45,6 +45,8 @@ pub struct PPU {
     vram: [u8; 0x2048],
     frame_palette: [u8; 32],
     oam: [u8; 256],
+    sprites: [Sprite; 8],
+    sprites_count: u8,
 
     // frame management
     odd: bool, // odd frame flag
@@ -62,6 +64,14 @@ pub struct PPU {
 
     // cartridge
     cart: Cart,
+}
+
+struct Sprite {
+    x: u16,
+    index: u8,
+    palette_index: u8,
+    show_bg: bool,
+    tile_row: [u8; 8],
 }
 
 impl PPU {
@@ -102,12 +112,16 @@ impl PPU {
             ///// x-scroll/y-scroll increment and copy x/y component from "t" to "v" /////
             self.increment_and_copy(fetch_line, fetch_dot, preline);
 
-            ////// do sprite evaluation and fetching //////
+            ////// do sprite evaluation //////
             if self.dot == 257 {
+                // fetching of sprites
                 if visible_line {
                     self.fetch_sprites();
-                } else {
-                    todo!("clear sprite memory");
+                } 
+                // clearing of sprites
+                // todo: add more precise timing 
+                else {
+                    self.sprites_count = 0;
                 }
             }
         }
