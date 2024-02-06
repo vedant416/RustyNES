@@ -110,7 +110,7 @@ impl super::PPU {
 
 // utils to extract info from ppu registers
 impl super::PPU {
-    // ctrl bits ////
+    //// ctrl bits ////
     pub fn genrate_nmi(&self) -> bool {
         self.ctrl & 0x80 != 0
     }
@@ -147,7 +147,7 @@ impl super::PPU {
         }
     }
 
-    // mask bits  ////
+    //// mask bits  ////
     pub fn sp_rendering_allowed(&self) -> bool {
         self.mask & 0x10 != 0
     }
@@ -168,7 +168,7 @@ impl super::PPU {
         self.bg_rendering_allowed() || self.sp_rendering_allowed()
     }
 
-    // status bits ////
+    //// status bits ////
     // vblank flag
     pub fn vblank_started(&self) -> bool {
         self.status & 0x80 != 0
