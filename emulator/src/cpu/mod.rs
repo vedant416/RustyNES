@@ -57,24 +57,3 @@ impl CPU {
         // return cycles taken (current cycle - recorded cycle)
     }
 }
-
-pub enum AddressingMode{
-    Implied,
-    Accumulator,
-    
-    Immediate,
-    
-    Relative,
-    
-    ZeroPage,
-    ZeroPageX,
-    ZeroPageY,
-    
-    Absolute,
-    AbsoluteX,
-    AbsoluteY,
-    
-    Indirect,
-    IndirectIndexed,
-    IndexedIndirect,
-} 

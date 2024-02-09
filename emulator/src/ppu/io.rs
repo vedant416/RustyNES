@@ -46,7 +46,7 @@ impl super::PPU {
             0x2005 => self.write_scroll(data),
             0x2006 => self.write_ppu_addr(data),
             0x2007 => self.write_ppu_data(data),
-            _ => println!("invalid PPU register address: 0x{:04X}", addr),
+            _ => unreachable!(),
         }
     }
 
