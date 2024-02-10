@@ -12,7 +12,7 @@ impl super::CPU {
         // check if branch crosses page boundary
         // between old and new address
         // if it does, add 1 cycle
-        if (old_addr & 0xff00) != (new_addr & 0xff00) {
+        if (old_addr & 0xFF00) != (new_addr & 0xFF00) {
             self.cycles += 1;
         }
     }

@@ -18,33 +18,48 @@ impl CPU {
         todo!("read");
     }
 
-    fn read_16(&mut self, addr: u16) -> u16 {
-        todo!("read_16");
-    }
-
-    fn read_16_from_same_page(&mut self, addr: u16) -> u16 {
-        todo!("read_16_wrap");
-    }
-
     fn write(&mut self, addr: u16, val: u8) {
         todo!("write");
     }
 
+    fn read_16(&mut self, addr: u16) -> u16 {
+        let lo = self.read(addr) as u16;
+        let hi = self.read(addr + 1) as u16;
+        (hi << 8) | lo
+    }
+
+    fn read_16_from_same_page(&mut self, addr: u16) -> u16 {
+        let lo = self.read(addr) as u16;
+        let hi = if addr & 0xFF != 0xFF {
+            self.read(addr + 1) as u16
+        } else {
+            self.read(addr & 0xFF00) as u16
+        };
+        (hi << 8) | lo
+    }
+
     //// Stack utils ////
     fn push_8(&mut self, val: u8) {
-        todo!("push_8");
+        self.write(0x100 | self.sp as u16, val);
+        self.sp = self.sp.wrapping_sub(1);
     }
 
     fn pull_8(&mut self) -> u8 {
-        todo!("pull_8");
+        self.sp = self.sp.wrapping_add(1);
+        self.read(0x100 | self.sp as u16)
     }
 
     fn push_16(&mut self, val: u16) {
-        todo!("push_16");
+        let hi = (val >> 8) as u8;
+        let lo = (val & 0xFF) as u8;
+        self.push_8(hi);
+        self.push_8(lo);
     }
 
     fn pull_16(&mut self) -> u16 {
-        todo!("pull_16");
+        let lo = self.pull_8() as u16;
+        let hi = self.pull_8() as u16;
+        (hi << 8) | lo
     }
 
     //// Status flag update utils ////
@@ -156,7 +171,7 @@ impl AddressingMode {
     }
 
     fn page_crossed(&self, addr_1: u16, addr_2: u16) -> bool {
-        (addr_1 & 0xff00) != (addr_2 & 0xff00)
+        (addr_1 & 0xFF00) != (addr_2 & 0xFF00)
     }
 }
 

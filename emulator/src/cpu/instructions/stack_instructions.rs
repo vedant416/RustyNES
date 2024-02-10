@@ -14,7 +14,7 @@ impl super::CPU {
     }
 
     pub fn plp(&mut self) {
-        let flags = self.pull_8() & 0xef | 0x20;
+        let flags = self.pull_8() & 0xEF | 0x20;
         self.set_flags(flags);
     }
 }
