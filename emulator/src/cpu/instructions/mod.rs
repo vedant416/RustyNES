@@ -64,15 +64,30 @@ impl CPU {
 
     //// Status flag update utils ////
     fn get_flags(&self) -> u8 {
-        todo!("get_flags");
+        (self.c as u8)
+        | (self.z as u8) << 1
+        | (self.i as u8) << 2
+        | (self.d as u8) << 3
+        | (self.b as u8) << 4
+        | (self.u as u8) << 5
+        | (self.v as u8) << 6
+        | (self.n as u8) << 7
     }
 
-    fn set_flags(&mut self, flags: u8) {
-        todo!("set_flags");
+    fn set_flags(&mut self, data: u8) {
+        self.c = data & 0x01 != 0;
+        self.z = data & 0x02 != 0;
+        self.i = data & 0x04 != 0;
+        self.d = data & 0x08 != 0;
+        self.b = data & 0x10 != 0;
+        self.u = data & 0x20 != 0;
+        self.v = data & 0x40 != 0;
+        self.n = data & 0x80 != 0;
     }
 
-    fn update_zn_flags(&mut self, val: u8) {
-        todo!("update_zn_flags");
+    fn update_zn_flags(&mut self, data: u8) {
+        self.n = data & 0x80 != 0;
+        self.z = data == 0;
     }
 }
 
