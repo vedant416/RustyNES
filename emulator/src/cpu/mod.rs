@@ -1,3 +1,5 @@
+use super::bus::BUS;
+
 mod instructions;
 pub struct CPU {
     a: u8,  // Accumulator
@@ -18,11 +20,14 @@ pub struct CPU {
     n: bool, // Negative (bit 7)
 
     // state
-    cycles: usize,
+    cycles: u32,
+    stall: u32,
+
+    bus: BUS,
 }
 
 impl CPU {
-    pub fn new_cpu() -> CPU {
+    pub fn new_cpu(bus: BUS) -> CPU {
         CPU {
             a: 0,
             x: 0,
@@ -41,6 +46,9 @@ impl CPU {
             n: false,
 
             cycles: 0,
+            stall: 0,
+
+            bus,
         }
     }
 

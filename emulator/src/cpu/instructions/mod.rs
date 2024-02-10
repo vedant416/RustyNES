@@ -1,6 +1,6 @@
 use super::CPU;
 
-//// module declarations ///////////////////////
+//// Module declarations ///////////////////////
 mod bitwise_instructions;
 mod branch_instructions;
 mod compare_instructions;
