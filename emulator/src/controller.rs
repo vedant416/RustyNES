@@ -9,7 +9,7 @@ impl Controller {
         todo!()
     }
 
-    pub fn write(&mut self) {
+    pub fn write(&mut self, val: u8) {
         todo!()
     }
 }

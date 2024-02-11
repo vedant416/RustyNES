@@ -58,7 +58,8 @@ pub struct PPU {
 
     open_bus: u8,
     data_latch: u8,
-    cartridge: Cartridge,
+    pub dma_triggered: bool,
+    pub cartridge: Cartridge,
 }
 
 #[derive(Clone, Copy)]
