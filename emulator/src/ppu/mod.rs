@@ -1,4 +1,4 @@
-use crate::rom::Cart;
+use crate::rom::Cartridge;
 mod fetch;
 mod io;
 mod render;
@@ -7,14 +7,10 @@ pub struct PPU {
     line: u16, // 0-261, 0-239=visible, 240=post, 241-260=vblank, 261=pre
 
     // PPU Registers
-    ctrl: u8,     // $2000
-    mask: u8,     // $2001
-    status: u8,   // $2002
-    oam_addr: u8, // $2003
-    // oamdata: u8,   // $2004
-    scroll: u8,    // $2005
-    // vram_addr: u8, // $2006
-    // ppudata: u8,   // $2007
+    pub ctrl: u8,
+    pub mask: u8,
+    pub status: u8,
+    pub oam_addr: u8,
 
     // Loopy Registers
     v: u16,  // Current VRAM address (15 bits)
@@ -42,7 +38,7 @@ pub struct PPU {
     pattern_table_high_latch: u8,
 
     // ppu memory
-    vram: [u8; 0x2048],
+    vram: [u8; 2048],
     frame_palette: [u8; 32],
     oam: [u8; 256],
     sprites: [Sprite; 8],
@@ -52,18 +48,17 @@ pub struct PPU {
     odd: bool, // odd frame flag
     frame_counter: u64,
     frame_buffer: Box<[u8; 256 * 240 * 4]>,
-
-    // other ppu stuff
-    open_bus: u8,
-    data_latch: u8,
+    pub frame_complete: bool,
 
     // nmi
     nmi_previous_state: bool,
     nmi_triggering_allowed: bool,
     nmi_triggered: bool,
 
-    // cartridge
-    cart: Cart,
+
+    open_bus: u8,
+    data_latch: u8,
+    cartridge: Cartridge,
 }
 
 #[derive(Clone, Copy)]

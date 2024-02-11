@@ -211,13 +211,13 @@ impl super::PPU {
 
 // read/write ppu address space
 impl super::PPU {
-    // CHR ROM 
+    // CHR ROM (Cartridge)
     pub fn read_chr(&mut self, addr: u16) -> u8 {
-        self.cart.mapper.read(&mut self.cart.data, addr)
+        self.cartridge.read(addr)
     }
 
     pub fn write_chr(&mut self, addr: u16, data: u8) {
-        self.cart.mapper.write(&mut self.cart.data, addr, data)
+        self.cartridge.write(addr, data);
     }
 
     pub fn read_chr_delayed(&mut self, addr: u16) -> u8 {
@@ -226,7 +226,7 @@ impl super::PPU {
         res
     }
 
-    // NAMETABLE 
+    // NAMETABLE (VRAM)
     pub fn read_nametable(&self, addr: u16) -> u8 {
         let addr = self.map_vram_addr(addr);
         self.vram[addr as usize]
@@ -243,7 +243,7 @@ impl super::PPU {
         res
     }
 
-    // PALETTE 
+    // PALETTE
     fn write_palette(&mut self, addr: u16, data: u8) {
         let addr = self.map_palette_addr(addr) as usize;
         self.frame_palette[addr] = data;
