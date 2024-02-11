@@ -1,4 +1,121 @@
+struct SpriteRenderData {
+    color: (u8, u8, u8),
+    index: u8,
+    show_bg: bool,
+}
 
+impl super::PPU {
+    pub fn render(&mut self) {
+        /*
+        pixel is not generated on dot 1
+        which makes x-coord 1-indexed
+        subtract by 1 to make x-coord 0-indexed
+        */
+        let x = (self.dot - 1) as usize;
+        let y = self.line as usize;
+
+        ///// handle clipping //////
+        let mut render_bg = self.bg_rendering_allowed();
+        let mut render_sp = self.sp_rendering_allowed();
+        if x < 8 {
+            if !self.leftmost_bg_rendering_allowed() {
+                render_bg = false;
+            }
+            if !self.leftmost_sp_rendering_allowed() {
+                render_sp = false;
+            }
+        }
+
+        ///// get final color //////
+        let bg = if render_bg { self.get_bg_color() } else { None };
+        let sp = if render_sp { self.get_sp_color() } else { None };
+        let color = match (bg, &sp) {
+            (None, None) => SYSTEM_PALETTE[self.frame_palette[0] as usize],
+            (None, Some(sp)) => sp.color,
+            (Some(bg), None) => bg,
+            (Some(bg), Some(sp)) => {
+                if sp.show_bg {
+                    bg
+                } else {
+                    sp.color
+                }
+            }
+        };
+
+        ///// handle sprite 0 hit /////
+        if let Some(sp) = &sp {
+            if sp.index == 0 && x < 255 && bg.is_some() && !self.sprite_0_hit() {
+                self.status = self.status | 0x40;
+            }
+        }
+
+        ///// put final color in frame buffer /////
+        let (r, g, b) = color;
+        if x < 256 && y < 240 {
+            let offset = (y * 256 + x) * 4;
+            self.frame_buffer[offset + 0] = r;
+            self.frame_buffer[offset + 1] = g;
+            self.frame_buffer[offset + 2] = b;
+            self.frame_buffer[offset + 3] = 255;
+        }
+    }
+
+    fn get_bg_color(&mut self) -> Option<(u8, u8, u8)> {
+        // upper 32 bits of shift register store the current tile row
+        let tile_row = self.shift_register >> 32;
+        /*
+        Pixel data is stored in below format:
+        Example => px0, px1, px2, px3, px4, px5, px6, px7
+        Bits  =>   7    6    5    4    3    2    1    0
+        To get px0, we need to get the bit7 of tile_row
+        so we need to shift by 7 - x => 7 - 0 = 7
+        we also need to multiply by 4 because each pixel is 4 bits
+        */
+        let shift = (7 - self.x) * 4;
+        let index = (((tile_row) >> shift) & 0xF) as usize;
+        // skip transparent pixels
+        if index & 3 == 0 {
+            return None;
+        }
+        // calculate color
+        let index = self.frame_palette[index] as usize;
+        let color = SYSTEM_PALETTE[index];
+        return Some(color);
+    }
+
+    fn get_sp_color(&mut self) -> Option<SpriteRenderData> {
+        let x = self.dot - 1;
+        // loop through all sprites in secondary OAM
+        // return color if non-transparent px is found
+        for i in 0..(self.sprites_count as usize) {
+            let sprite = self.sprites[i];
+            // skip current sprite if x is not 8px range of sprite.x
+            if !(sprite.x..=sprite.x + 7).contains(&x) {
+                continue;
+            }
+            let index = (x - sprite.x) as usize;
+            let color_index = sprite.tile_row[index];
+            // skip transparent pixels
+            if color_index & 3 == 0 {
+                continue;
+            }
+            // calculate color
+            // sprite palette address is offset by 0x10
+            let index = self.frame_palette[(0x10 + color_index) as usize] as usize;
+            let color = SYSTEM_PALETTE[index];
+            return Some(SpriteRenderData {
+                color,
+                show_bg: sprite.show_bg,
+                index: sprite.index,
+            });
+        }
+        return None;
+    }
+}
+
+// SYSTEM_PALETTE does not change
+// It is static memory within the PPU
+// frame_palette stores indexes in SYSTEM_PALETTE
 pub static SYSTEM_PALETTE: [(u8, u8, u8); 64] = [
     (0x80, 0x80, 0x80),
     (0x00, 0x3D, 0xA6),
@@ -65,92 +182,3 @@ pub static SYSTEM_PALETTE: [(u8, u8, u8); 64] = [
     (0x11, 0x11, 0x11),
     (0x11, 0x11, 0x11),
 ];
-
-//// rendering ////////////////////////////////
-impl super::PPU {
-    pub fn render(&mut self) {
-        /*
-        pixel is not generated on dot 1
-        which makes x-coord 1-indexed
-        subtract by 1 to make x-coord 0-indexed
-        */
-        let x = (self.dot - 1) as usize;
-        let y = self.line as usize;
-
-        ///// handle clipping //////
-        let mut render_sp = self.bg_rendering_allowed();
-        let mut render_bg = self.sp_rendering_allowed();
-        if x < 8 {
-            if !self.leftmost_bg_rendering_allowed() {
-                render_bg = false;
-            }
-            if !self.leftmost_sp_rendering_allowed() {
-                render_sp = false;
-            }
-        }
-
-        ///// get final color //////
-        let bg = if render_bg { self.get_bg_color() } else { None };
-        let sp = if render_sp { self.get_sp_color() } else { None };
-        let combined_color = match (bg, sp) {
-            (None, None) => SYSTEM_PALETTE[self.frame_palette[0] as usize],
-            (None, Some((sp, _, _))) => sp,
-            (Some(bg), None) => bg,
-            (Some(bg), Some((sp, behind_bg, _))) => {
-                if behind_bg {
-                    bg
-                } else {
-                    sp
-                }
-            }
-        };
-
-        ///// handle sprite 0 hit //////
-        if let Some((_, _, idx)) = sp {
-            if idx == 0 && x < 255 && bg.is_some() && !self.sprite_0_hit() {
-                self.set_sprite_0_hit();
-            }
-        }
-        
-        ///// put final color in frame buffer //////
-        if x < 256 && y < 240 {
-            let offset = (y * 256 + x) * 4;
-            self.frame_buffer[offset] = combined_color.0;
-            self.frame_buffer[offset + 1] = combined_color.1;
-            self.frame_buffer[offset + 2] = combined_color.2;
-            self.frame_buffer[offset + 3] = 255;
-        }
-    }
-
-    fn get_bg_color(&mut self) -> Option<(u8, u8, u8)> {
-        // upper 32 bits of shift register store the current tile row
-        let tile_row = self.shift_register >> 32;
-        // we store pixel data in reverse order
-        // so we need to shift by 7 - x
-        // we also need to multiply by 4 because each pixel is 4 bits
-        let shift = (7 - self.x) * 4;
-        let color_idx = (((tile_row) >> shift) & 0xF) as usize;
-        if color_idx & 3 != 0 {
-            return Some(SYSTEM_PALETTE[self.frame_palette[color_idx] as usize]);
-        }
-        return None;
-    }
-
-    fn get_sp_color(&mut self) -> Option<((u8, u8, u8), bool, u8)> {
-        let x = self.dot - 1;
-        for i in 0..(self.sprites_count as usize) {
-            let sprite = self.sprites[i];
-            if x >= sprite.x && x < sprite.x + 8 {
-                let color_idx = sprite.tile_row[(x - sprite.x) as usize];
-                if color_idx != 0 {
-                    let index = 0x10 + (sprite.palette_index as usize) * 4 + (color_idx as usize);
-                    let index = self.frame_palette[index] as usize;
-                    let color = SYSTEM_PALETTE[index];
-                    return Some((color, sprite.show_bg, sprite.index));
-                }
-            }
-        }
-        return None;
-    }
-
-}

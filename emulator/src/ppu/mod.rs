@@ -66,11 +66,10 @@ pub struct PPU {
     cart: Cart,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Clone, Copy)]
 struct Sprite {
     x: u16,
     index: u8,
-    palette_index: u8,
     show_bg: bool,
     tile_row: [u8; 8],
 }
@@ -96,6 +95,7 @@ impl PPU {
         // which time?
         let render_time = visible_line && visible_dot;
         let fetch_time = fetch_line && fetch_dot;
+        let sp_fetch_time = self.dot == 256 && visible_line;
 
         let rendering_enabled = self.is_rendering_enabled();
 
@@ -110,21 +110,13 @@ impl PPU {
                 self.fetch_bg()
             }
 
-            ///// x-scroll/y-scroll increment and copy x/y component from "t" to "v" /////
-            self.increment_and_copy(fetch_line, fetch_dot, preline);
-
-            ////// do sprite evaluation //////
-            if self.dot == 257 {
-                // fetching of sprites
-                if visible_line {
-                    self.fetch_sprites();
-                } 
-                // clearing of sprites
-                // todo: add more precise timing 
-                else {
-                    self.sprites_count = 0;
-                }
+            ////// fetch sprites //////
+            if sp_fetch_time {
+                self.fetch_sprites();
             }
+
+            //// increment course x and fine y and copy x and y bits from t to v ////
+            self.increment_and_copy(fetch_line, fetch_dot, preline);
         }
 
         ////// enter vblank //////
@@ -142,11 +134,11 @@ impl PPU {
         }
 
         ////// nmi handling //////
-        if self.nmi_triggering_allowed && self.genrate_nmi() && self.vblank_started() {
+        if self.nmi_triggering_allowed && self.current_nmi_state() {
             self.nmi_triggered = true;
             self.nmi_triggering_allowed = false;
         }
-        
+
         ////// dot, line and frame counters (increment) and (reset) and special case of (skipping) //////
         if rendering_enabled && self.odd && self.line == 261 && self.dot == 339 {
             // skip cycle 339 of pre-render scanline when odd frame
@@ -174,13 +166,17 @@ impl PPU {
 
     //// nmi handling /////////////////////////////
     fn update_nmi_state(&mut self) {
-        let nmi_current_state = self.genrate_nmi() && self.vblank_started();
+        let nmi_current_state = self.current_nmi_state();
 
         if !self.nmi_previous_state && nmi_current_state {
             self.nmi_triggering_allowed = true;
         }
 
         self.nmi_previous_state = nmi_current_state;
+    }
+
+    fn current_nmi_state(&self) -> bool {
+        self.genrate_nmi() && self.vblank_started()
     }
 
     //// increment and copy //////////////////////
@@ -230,5 +226,3 @@ impl PPU {
         }
     }
 }
-
-

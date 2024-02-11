@@ -47,6 +47,7 @@ impl super::PPU {
         let fine_y = ((self.v >> 12) & 0b111) as u8;
         let addr = table + tile_num * 16 + fine_y as u16;
 
+        // pattern table is stored in chr_rom located in cartridge
         self.pattern_table_low_latch = self.read_chr(addr);
         self.pattern_table_high_latch = self.read_chr(addr + 8);
     }
@@ -79,64 +80,64 @@ impl super::PPU {
             let offset = i * 4;
             let y = self.oam[offset] as u16;
 
-            // if the sprite lies on the current line
-            if (y..=y + height).contains(&self.line) {
-                let attr = self.oam[offset + 2];
-                let palette_idx = attr & 0b0000_0011;
-                let behind_background = attr & 0b0010_0000 != 0;
-                let flip_horizontally = attr & 0b0100_0000 != 0;
-                let flip_vertically = attr & 0b1000_0000 != 0;
-                let x = self.oam[offset + 3];
+            // check if the sprite lies on the current line
+            if !(y..=y + height).contains(&self.line) {
+                continue;
+            }
+            let attr = self.oam[offset + 2];
+            let palette_idx = attr & 0b0000_0011;
+            let show_bg = attr & 0b0010_0000 != 0;
+            let flip_horizontally = attr & 0b0100_0000 != 0;
+            let flip_vertically = attr & 0b1000_0000 != 0;
+            let x = self.oam[offset + 3];
 
-                // calculate which row of the sprite is being rendered
-                let row = self.line - y;
-                // flip the row if the sprite is flipped vertically
-                let mut row = if flip_vertically { height - row } else { row };
-                let mut tile_idx: u16 = self.oam[offset + 1] as u16;
-                let mut chr_bank = self.sprite_pt_addr();
+            // calculate which row of the sprite is being rendered
+            let row = self.line - y;
+            // flip the row if the sprite is flipped vertically
+            let mut row = if flip_vertically { height - row } else { row };
+            let mut tile_idx: u16 = self.oam[offset + 1] as u16;
+            let mut chr_bank = self.sprite_pt_addr();
 
-                // if the sprite is 8x16, the chr bank is determined by the least significant bit of the tile index
-                if height == 15 {
-                    chr_bank = (tile_idx & 1) * 0x1000;
-                    tile_idx = tile_idx & 0xFE;
-                    if row > 7 {
-                        // add 1 to use the second tile of the 8x16 sprite
-                        tile_idx += 1;
-                        // adjust the row within the second tile (0-7)
-                        row -= 8;
-                    }
-                };
-
-                // get the data for the row
-                let tile_offset = chr_bank + tile_idx * 16 + row;
-                let chr_low = self.read_chr(tile_offset);
-                let chr_high = self.read_chr(tile_offset + 8);
-                // iterate over each pixel in the row
-                // and combine the two bit planes into a single byte
-                let mut tile_row = [0u8; 8];
-                for i in 0..8 {
-                    let pixel_index = 1 << if flip_horizontally { i } else { 7 - i };
-                    let p1 = (chr_low & pixel_index != 0) as u8;
-                    let p2 = (chr_high & pixel_index != 0) as u8;
-                    let pattern = (p2 << 1) | p1;
-                    tile_row[i] = pattern;
+            // if the sprite is 8x16, the chr bank is determined by the least significant bit of the tile index
+            if height == 15 {
+                chr_bank = (tile_idx & 1) * 0x1000;
+                tile_idx = tile_idx & 0xFE;
+                if row > 7 {
+                    // add 1 to use the second tile of the 8x16 sprite
+                    tile_idx += 1;
+                    // adjust the row within the second tile (0-7)
+                    row -= 8;
                 }
+            };
 
-                // store x coordinate, tile index, palette index, behind background, and the chr
-                self.sprites[count] = super::Sprite {
-                    x: x as u16,
-                    index: i as u8,
-                    palette_index: palette_idx,
-                    show_bg: behind_background,
-                    tile_row,
-                };
+            // get the data for the row
+            let tile_offset = chr_bank + tile_idx * 16 + row;
+            let chr_low = self.read_chr(tile_offset);
+            let chr_high = self.read_chr(tile_offset + 8);
+            // iterate over each pixel in the row
+            // and combine the two bit planes into a single byte
+            let mut tile_row = [0u8; 8];
+            for i in 0..8 {
+                let pixel_index = 1 << if flip_horizontally { i } else { 7 - i };
+                let p1 = (chr_low & pixel_index != 0) as u8;
+                let p2 = (chr_high & pixel_index != 0) as u8;
+                let pattern = (palette_idx << 2) | (p2 << 1) | p1;
+                tile_row[i] = pattern;
+            }
 
-                count += 1;
+            // store x coordinate, tile index, palette index, behind background, and the chr
+            self.sprites[count] = super::Sprite {
+                x: x as u16,
+                index: i as u8,
+                show_bg,
+                tile_row,
+            };
 
-                if count == 8 {
-                    self.set_sprite_overflow();
-                    break;
-                }
+            count += 1;
+
+            if count == 8 {
+                self.set_sprite_overflow();
+                break;
             }
         }
 
