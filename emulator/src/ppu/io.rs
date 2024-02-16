@@ -252,10 +252,16 @@ impl super::PPU {
 
     // Mirrorings
     pub fn map_vram_addr(&self, addr: u16) -> u16 {
-        todo!("Implement palette mirroring")
+        let mirror_mode = &self.cartridge.get_data().mirroring;
+        mirror_mode.get_address(addr)
     }
 
     pub fn map_palette_addr(&self, addr: u16) -> u16 {
-        todo!("Implement palette mirroring")
+        let addr = (addr - 0x3F00) & 31;
+        if addr > 16 && addr & 3 == 0 {
+            addr - 16
+        } else {
+            addr
+        }
     }
 }
