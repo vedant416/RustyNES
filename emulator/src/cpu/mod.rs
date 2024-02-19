@@ -1,3 +1,5 @@
+use self::instructions::{OPCODE, OPCODES};
+
 use super::bus::BUS;
 
 mod instructions;
@@ -22,7 +24,7 @@ pub struct CPU {
     // state
     cycles: u32,
     stall: u32,
-
+    // for communication with other components
     bus: BUS,
 }
 
@@ -52,16 +54,62 @@ impl CPU {
         }
     }
 
-    pub fn step(&mut self) -> usize {
-        todo!()
-        // handle early return due to dma
-        // handle interrupts
+    pub fn step(&mut self) -> u32 {
         // record cycle before executing instruction
+        let start_cycle = self.cycles;
+
+        // handle dma
+        self.handle_dma();
+
+        // handle early return if cpu is stalled
+        if self.stall > 0 {
+            self.stall -= 1;
+            return 1;
+        }
+
+        // handle interrupt
+        self.handle_interrupt();
+
         // fetch instruction
+        let opcode = self.bus.read(self.pc) as usize;
+
         // decode instruction
-        // fetch address of operand and addressing mode
-        // update pc and cycles
-        // execute instruction(address, addressing mode)
-        // return cycles taken (current cycle - recorded cycle)
+        let opcode = &OPCODES[opcode];
+        let OPCODE {
+            instruction,
+            mode,
+            size,
+            cycles,
+            extra_cycles,
+        } = opcode;
+
+        // update pc to next instruction
+        self.pc += size;
+
+        // fetch address of operand and check if page crossed
+        // fetching from memory takes extra cycles if page boundary is crossed
+        let (address, page_crossed) = mode.fetch_operand_address(self);
+
+        // execute instruction and pass address of operand and addressing mode
+        instruction.execute(self, address, mode);
+
+        // update cycles after executing instruction
+        if page_crossed {
+            self.cycles += cycles + extra_cycles;
+        } else {
+            self.cycles += cycles;
+        }
+
+        // return cycles taken to execute instruction
+        self.cycles - start_cycle
     }
+
+    fn handle_dma(&self) {
+        todo!()
+    }
+
+    fn handle_interrupt(&mut self) {
+        todo!()
+    }
+
 }

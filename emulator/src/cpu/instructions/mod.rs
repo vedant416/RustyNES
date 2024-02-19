@@ -114,7 +114,7 @@ pub enum AddressingMode {
 }
 
 impl AddressingMode {
-    pub fn get_address(&self, cpu: &mut CPU) -> (u16, bool) {
+    pub fn fetch_operand_address(&self, cpu: &mut CPU) -> (u16, bool) {
         let pc = cpu.pc;
         match *self {
             AddressingMode::Accumulator => (0, false),
