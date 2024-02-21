@@ -1,8 +1,8 @@
 use self::instructions::{OPCODE, OPCODES};
-
 use super::bus::BUS;
-
 mod instructions;
+
+
 pub struct CPU {
     a: u8,  // Accumulator
     x: u8,  // X register
@@ -104,12 +104,13 @@ impl CPU {
         self.cycles - start_cycle
     }
 
-    fn handle_dma(&self) {
-        todo!()
+    fn handle_dma(&mut self) {
+        if self.bus.ppu.dma_triggered() {
+            self.stall = 513;
+        }
     }
 
     fn handle_interrupt(&mut self) {
         todo!()
     }
-
 }

@@ -222,3 +222,17 @@ impl PPU {
         }
     }
 }
+
+impl PPU {
+    pub fn dma_triggered(&mut self) -> bool {
+        let triggered = self.dma_triggered;
+        self.dma_triggered = false;
+        triggered
+    }
+
+    pub fn nmi_triggered(&mut self) -> bool {
+        let triggered = self.nmi_triggered;
+        self.nmi_triggered = false;
+        triggered
+    }
+}
