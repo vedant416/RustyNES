@@ -2,6 +2,11 @@ use self::instructions::{OPCODE, OPCODES};
 use super::bus::BUS;
 mod instructions;
 
+pub enum Interrupt {
+    NMI,
+    IRQ,
+    None,
+}
 
 pub struct CPU {
     a: u8,  // Accumulator
@@ -56,7 +61,7 @@ impl CPU {
 
     pub fn step(&mut self) -> u32 {
         // record cycle before executing instruction
-        let start_cycle = self.cycles;
+        let start_cycles = self.cycles;
 
         // handle dma
         self.handle_dma();
@@ -83,12 +88,12 @@ impl CPU {
             extra_cycles,
         } = opcode;
 
-        // update pc to next instruction
-        self.pc += size;
-
         // fetch address of operand and check if page crossed
         // fetching from memory takes extra cycles if page boundary is crossed
         let (address, page_crossed) = mode.fetch_operand_address(self);
+
+        // update pc to next instruction
+        self.pc += size;
 
         // execute instruction and pass address of operand and addressing mode
         instruction.execute(self, address, mode);
@@ -101,16 +106,28 @@ impl CPU {
         }
 
         // return cycles taken to execute instruction
-        self.cycles - start_cycle
+        self.cycles - start_cycles
     }
 
     fn handle_dma(&mut self) {
         if self.bus.ppu.dma_triggered() {
-            self.stall = 513;
+            self.stall += 513 + (self.cycles & 1);
         }
     }
 
     fn handle_interrupt(&mut self) {
-        todo!()
+        match self.bus.ppu.interrupt_triggered() {
+            Interrupt::NMI => self.interrupt(0xFFFA),
+            Interrupt::IRQ => self.interrupt(0xFFFE),
+            Interrupt::None => {}
+        }
+    }
+
+    fn interrupt(&mut self, vector: u16) {
+        self.push_16(self.pc); // push program counter
+        self.php(); // push status register
+        self.i = true; // set interrupt disable flag to true
+        self.pc = self.read_16(vector); // set program counter to interrupt vector
+        self.cycles += 7;
     }
 }

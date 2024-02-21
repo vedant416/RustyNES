@@ -22,7 +22,7 @@ impl CPU {
         todo!("write");
     }
 
-    fn read_16(&mut self, addr: u16) -> u16 {
+    pub fn read_16(&mut self, addr: u16) -> u16 {
         let lo = self.read(addr) as u16;
         let hi = self.read(addr + 1) as u16;
         (hi << 8) | lo
@@ -49,7 +49,7 @@ impl CPU {
         self.read(0x100 | self.sp as u16)
     }
 
-    fn push_16(&mut self, val: u16) {
+    pub fn push_16(&mut self, val: u16) {
         let hi = (val >> 8) as u8;
         let lo = (val & 0xFF) as u8;
         self.push_8(hi);

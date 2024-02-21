@@ -1,4 +1,4 @@
-use crate::rom::Cartridge;
+use crate::{cpu::Interrupt, rom::Cartridge};
 mod fetch;
 mod io;
 mod render;
@@ -55,7 +55,6 @@ pub struct PPU {
     nmi_triggering_allowed: bool,
     nmi_triggered: bool,
 
-
     open_bus: u8,
     data_latch: u8,
     pub dma_triggered: bool,
@@ -92,6 +91,7 @@ impl PPU {
         let render_time = visible_line && visible_dot;
         let fetch_time = fetch_line && fetch_dot;
         let sp_fetch_time = self.dot == 256 && visible_line;
+        let cartridge_step_time = self.dot == 260 && visible_line;
 
         let rendering_enabled = self.is_rendering_enabled();
 
@@ -111,12 +111,18 @@ impl PPU {
                 self.fetch_sprites();
             }
 
-            //// increment course x and fine y and copy x and y bits from t to v ////
+            ///// step cartridge //////
+            if cartridge_step_time {
+                self.cartridge.step();
+            }
+
+            //// increment coarse x and fine y and copy x and y bits from t to v ////
             self.increment_and_copy(fetch_line, fetch_dot, preline);
         }
 
         ////// enter vblank //////
         if self.line == 241 && self.dot == 1 {
+            self.frame_complete = true;
             self.set_vblank_started();
             self.update_nmi_state();
         }
@@ -234,5 +240,15 @@ impl PPU {
         let triggered = self.nmi_triggered;
         self.nmi_triggered = false;
         triggered
+    }
+
+    pub fn interrupt_triggered(&mut self) -> Interrupt {
+        if self.nmi_triggered() {
+            return Interrupt::NMI;
+        } else if self.cartridge.irq_triggered() {
+            return Interrupt::IRQ;
+        } else {
+            return Interrupt::None;
+        }
     }
 }
