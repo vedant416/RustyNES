@@ -38,7 +38,7 @@ pub struct PPU {
     pattern_table_high_latch: u8,
 
     // ppu memory
-    vram: [u8; 2048],
+    vram: [u8; 0x800],
     frame_palette: [u8; 32],
     oam: [u8; 256],
     sprites: [Sprite; 8],
@@ -60,7 +60,6 @@ pub struct PPU {
     pub dma_triggered: bool,
     pub cartridge: Cartridge,
 }
-
 #[derive(Clone, Copy)]
 struct Sprite {
     x: u16,
@@ -69,9 +68,71 @@ struct Sprite {
     tile_row: [u8; 8],
 }
 
+impl Sprite {
+    fn new() -> Self {
+        Self {
+            x: 0,
+            index: 0,
+            show_bg: false,
+            tile_row: [0; 8],
+        }
+    }
+
+
+}
 impl PPU {
-    pub fn new() -> Self {
-        todo!("Implement PPU::new")
+    pub fn new(cartridge: Cartridge) -> PPU {
+        let mut ppu = PPU {
+            // state
+            dot: 0,
+            line: 0,
+
+            // registers
+            ctrl: 0,
+            mask: 0,
+            status: 0,
+            oam_addr: 0,
+
+            // loopy registers
+            v: 0,
+            t: 0,
+            x: 0,
+            w: false,
+
+            // shift register and latches
+            shift_register: 0,
+            nametable_latch: 0,
+            attribute_table_latch: 0,
+            pattern_table_low_latch: 0,
+            pattern_table_high_latch: 0,
+
+            // memory
+            vram: [0; 0x800],
+            frame_palette: [0; 32],
+            oam: [0; 256],
+            sprites: [Sprite::new(); 8],
+            sprites_count: 0,
+
+            // frame management
+            odd: false,
+            frame_counter: 0,
+            frame_buffer: Box::new([0; 256 * 240 * 4]),
+            frame_complete: false,
+
+            // nmi
+            nmi_previous_state: false,
+            nmi_triggering_allowed: false,
+            nmi_triggered: false,
+
+            open_bus: 0,
+            data_latch: 0,
+            dma_triggered: false,
+            cartridge,
+        };
+        // start ppu from line where vblank starts
+        // during vblank, cpu writes rendering data to ppu memory
+        ppu.line = 241;
+        ppu
     }
 }
 
@@ -212,7 +273,7 @@ impl PPU {
                         y += 1; // increment coarse Y
                     }
 
-                    self.v = (self.v & !0x03E0) | (y << 5); // put coarse Y back into v
+                    self.v = (self.v & !0x03E0) | (y << 5); // put coarse Y in v
                 }
             }
 
