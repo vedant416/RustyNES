@@ -37,6 +37,7 @@ pub struct ROM {
     pub trainer: bool,
 }
 
+
 /*
 ines file format
 header (16 bytes)
@@ -44,7 +45,7 @@ trainer (0 or 512 bytes)
 prg rom (16KB * number of prg rom banks)
 chr rom (8KB * number of chr rom banks)
 */
-pub fn create_cartridge(bytes: Vec<u8>) -> Cartridge {
+pub fn new_cartridge(bytes: Vec<u8>) -> Cartridge {
     // Check file signature
     let signature = &bytes[0..4];
     if signature != [78, 69, 83, 26] {

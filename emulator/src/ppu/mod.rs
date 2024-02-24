@@ -47,7 +47,7 @@ pub struct PPU {
     // frame management
     odd: bool, // odd frame flag
     frame_counter: u64,
-    frame_buffer: Box<[u8; 256 * 240 * 4]>,
+    pub frame_buffer: [u8; 256 * 240 * 4],
     pub frame_complete: bool,
 
     // nmi
@@ -81,7 +81,7 @@ impl Sprite {
 
 }
 impl PPU {
-    pub fn new(cartridge: Cartridge) -> PPU {
+    pub fn new_ppu(cartridge: Cartridge) -> PPU {
         let mut ppu = PPU {
             // state
             dot: 0,
@@ -116,7 +116,7 @@ impl PPU {
             // frame management
             odd: false,
             frame_counter: 0,
-            frame_buffer: Box::new([0; 256 * 240 * 4]),
+            frame_buffer: [0; 256 * 240 * 4],
             frame_complete: false,
 
             // nmi

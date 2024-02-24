@@ -30,7 +30,7 @@ pub struct CPU {
     cycles: u32,
     stall: u32,
     // for communication with other components
-    bus: BUS,
+    pub bus: BUS,
 }
 
 impl CPU {
@@ -57,7 +57,7 @@ impl CPU {
 
             bus,
         };
-        
+
         // inital state of cpu
         cpu.sp = 0xFD;
         cpu.pc = cpu.read_16(0xFFFC);

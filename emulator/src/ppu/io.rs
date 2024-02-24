@@ -258,7 +258,7 @@ impl super::PPU {
 
     pub fn map_palette_addr(&self, addr: u16) -> u16 {
         let addr = (addr - 0x3F00) & 31;
-        if addr > 16 && addr & 3 == 0 {
+        if addr >= 16 && addr & 3 == 0 {
             addr - 16
         } else {
             addr

@@ -9,7 +9,7 @@ pub struct BUS {
 }
 
 impl BUS {
-    pub fn new(ppu: PPU, controller: Controller) -> Self {
+    pub fn new_bus(ppu: PPU, controller: Controller) -> Self {
         Self {
             ram: [0; 0x800],
             ppu,
