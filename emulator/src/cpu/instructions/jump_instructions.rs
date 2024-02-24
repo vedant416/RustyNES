@@ -16,14 +16,12 @@ impl super::CPU {
     pub fn brk(&mut self) {
         let pc = self.pc + 1;
         self.push_16(pc);
-        
+
         self.b = true;
         self.push_8(self.get_flags() | 0x10);
         self.i = true;
-        
-        let lo = self.read(0xFFFE) as u16;
-        let hi = self.read(0xFFFF) as u16;
-        self.pc = (hi << 8) | lo;
+
+        self.pc = self.read_16(0xFFFE);
     }
 
     pub fn rti(&mut self) {

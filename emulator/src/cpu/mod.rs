@@ -35,7 +35,7 @@ pub struct CPU {
 
 impl CPU {
     pub fn new_cpu(bus: BUS) -> CPU {
-        CPU {
+        let mut cpu = CPU {
             a: 0,
             x: 0,
             y: 0,
@@ -56,7 +56,15 @@ impl CPU {
             stall: 0,
 
             bus,
-        }
+        };
+        
+        // inital state of cpu
+        cpu.sp = 0xFD;
+        cpu.pc = cpu.read_16(0xFFFC);
+        cpu.cycles = 7;
+        cpu.i = true;
+        cpu.u = true;
+        cpu
     }
 
     pub fn step(&mut self) -> u32 {

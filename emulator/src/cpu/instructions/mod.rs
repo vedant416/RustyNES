@@ -15,11 +15,11 @@ mod stack_instructions;
 impl CPU {
     //// IO utils ////
     fn read(&mut self, addr: u16) -> u8 {
-        todo!("read");
+        self.bus.read(addr)
     }
 
     fn write(&mut self, addr: u16, val: u8) {
-        todo!("write");
+        self.bus.write(addr, val);
     }
 
     pub fn read_16(&mut self, addr: u16) -> u16 {

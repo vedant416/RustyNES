@@ -30,12 +30,8 @@ impl super::CPU {
         self.update_zn_flags(result);
 
         match *addr_mode {
-            AddressingMode::Accumulator => {
-                self.a = result;
-            }
-            _ => {
-                self.write(addr, result);
-            }
+            AddressingMode::Accumulator => self.a = result,
+            _ => self.write(addr, result),
         };
     }
 
@@ -50,12 +46,8 @@ impl super::CPU {
         self.update_zn_flags(result);
 
         match *addr_mode {
-            AddressingMode::Accumulator => {
-                self.a = result;
-            }
-            _ => {
-                self.write(addr, result);
-            }
+            AddressingMode::Accumulator => self.a = result,
+            _ => self.write(addr, result),
         };
     }
 
@@ -70,12 +62,8 @@ impl super::CPU {
         self.update_zn_flags(result);
 
         match *addr_mode {
-            AddressingMode::Accumulator => {
-                self.a = result;
-            }
-            _ => {
-                self.write(addr, result);
-            }
+            AddressingMode::Accumulator => self.a = result,
+            _ => self.write(addr, result),
         };
     }
 
@@ -90,12 +78,8 @@ impl super::CPU {
         self.update_zn_flags(result);
 
         match *addr_mode {
-            AddressingMode::Accumulator => {
-                self.a = result;
-            }
-            _ => {
-                self.write(addr, result);
-            }
+            AddressingMode::Accumulator => self.a = result,
+            _ => self.write(addr, result),
         };
     }
 }
