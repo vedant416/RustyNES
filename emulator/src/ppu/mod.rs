@@ -77,8 +77,6 @@ impl Sprite {
             tile_row: [0; 8],
         }
     }
-
-
 }
 impl PPU {
     pub fn new_ppu(cartridge: Cartridge) -> PPU {
@@ -288,9 +286,7 @@ impl PPU {
             self.v = (self.v & 0x841F) | (self.t & 0x7BE0);
         }
     }
-}
 
-impl PPU {
     pub fn dma_triggered(&mut self) -> bool {
         let triggered = self.dma_triggered;
         self.dma_triggered = false;
@@ -311,5 +307,11 @@ impl PPU {
         } else {
             return Interrupt::None;
         }
+    }
+
+    pub fn frame_complete(&mut self) -> bool {
+        let complete = self.frame_complete;
+        self.frame_complete = false;
+        complete
     }
 }
