@@ -37,7 +37,6 @@ pub struct ROM {
     pub trainer: bool,
 }
 
-
 /*
 ines file format
 header (16 bytes)

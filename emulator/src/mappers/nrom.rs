@@ -1,5 +1,5 @@
-use crate::rom::ROM;
 use super::Mapper;
+use crate::rom::ROM;
 
 pub struct NROM {
     prg_ram: [u8; 0x800],

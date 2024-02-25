@@ -301,11 +301,11 @@ impl PPU {
 
     pub fn interrupt_triggered(&mut self) -> Interrupt {
         if self.nmi_triggered() {
-            return Interrupt::NMI;
+            Interrupt::NMI
         } else if self.cartridge.irq_triggered() {
-            return Interrupt::IRQ;
+            Interrupt::IRQ
         } else {
-            return Interrupt::None;
+            Interrupt::None
         }
     }
 

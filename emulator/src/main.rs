@@ -1,6 +1,3 @@
-#![allow(dead_code)]
-#![allow(unused_variables)]
-
 pub mod bus;
 pub mod controller;
 pub mod cpu;
@@ -8,16 +5,14 @@ pub mod mappers;
 pub mod ppu;
 pub mod rom;
 
-use bus::BUS;
-use controller::Controller;
-use cpu::CPU;
-use ppu::PPU;
-use rom::new_cartridge;
-
+use self::{bus::BUS, controller::Controller, cpu::CPU, ppu::PPU, rom::new_cartridge};
 use sdl2::{event::Event, keyboard::Keycode, pixels::PixelFormatEnum, EventPump};
-
-use std::thread;
-use std::{env::args, fs::read, process, time::Duration, time::Instant};
+use std::{
+    env::args,
+    fs::read,
+    process, thread,
+    time::{Duration, Instant},
+};
 
 fn main() {
     let args: Vec<String> = args().collect();
@@ -51,20 +46,20 @@ fn main() {
         .expect("could not create canvas");
 
     // 3x scale canvas
-    canvas.set_scale(3 as f32, 3 as f32).unwrap();
+    canvas.set_scale(3_f32, 3_f32).unwrap();
 
     // Create texture
     let texture_creator = canvas.texture_creator();
     let mut texture = texture_creator
-        .create_texture_target(PixelFormatEnum::ABGR8888, 256 as u32, 240 as u32)
+        .create_texture_target(PixelFormatEnum::ABGR8888, 256_u32, 240_u32)
         .unwrap();
 
     // Event handling
     let mut event_pump = sdl.event_pump().unwrap();
 
     // For 60 fps emulation
-    let target_fps = 62;
-    let target_duration = Duration::from_secs_f64(1.0 / target_fps as f64);
+    let target_fps = 62_f64;
+    let target_duration = Duration::from_secs_f64(1.0 / target_fps);
     let mut frame_start_time;
 
     // Game loop
@@ -95,7 +90,6 @@ fn main() {
 
         // Time taken to emulate frame
         let elapsed_time = frame_start_time.elapsed();
-        let frame = 1;
         // If frame was emulated faster than target duration, sleep for remaining time
         let remaining_time = target_duration.checked_sub(elapsed_time);
         if let Some(remaining_time) = remaining_time {

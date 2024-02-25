@@ -101,7 +101,7 @@ impl super::PPU {
             // if the sprite is 8x16, the chr bank is determined by the least significant bit of the tile index
             if height == 15 {
                 chr_bank = (tile_idx & 1) * 0x1000;
-                tile_idx = tile_idx & 0xFE;
+                tile_idx &= 0xFE;
                 if row > 7 {
                     // add 1 to use the second tile of the 8x16 sprite
                     tile_idx += 1;
