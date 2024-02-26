@@ -10,4 +10,6 @@ pub trait Mapper {
     fn irq_triggered(&self) -> bool {
         false
     }
+
+    fn as_any(&self) -> &dyn std::any::Any;
 }

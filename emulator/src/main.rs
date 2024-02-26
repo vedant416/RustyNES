@@ -1,11 +1,11 @@
-pub mod bus;
-pub mod controller;
-pub mod cpu;
-pub mod mappers;
-pub mod ppu;
-pub mod rom;
-
-use self::{bus::BUS, controller::Controller, cpu::CPU, ppu::PPU, rom::new_cartridge};
+use emulator::{
+    bus::{BusState, BUS},
+    controller::{Controller, ControllerState},
+    cpu::{CpuState, CPU},
+    mappers::nrom::NROM,
+    ppu::{PpuState, PPU},
+    rom::{new_cartridge, Cartridge},
+};
 use sdl2::{event::Event, keyboard::Keycode, pixels::PixelFormatEnum, EventPump};
 use std::{
     env::args,
@@ -28,6 +28,8 @@ fn main() {
     let controller = Controller::new_controller();
     let bus = BUS::new_bus(ppu, controller);
     let mut cpu = CPU::new_cpu(bus);
+    // Save initial state of Emulator
+    let mut state = get_state(&mut cpu);
 
     // Initialize SDL
     let sdl = sdl2::init().unwrap();
@@ -68,7 +70,7 @@ fn main() {
         frame_start_time = Instant::now();
 
         // Handle input
-        handle_input(&mut event_pump, &mut cpu.bus.controller);
+        handle_input(&mut cpu, &mut state, &mut event_pump);
 
         // Get rendering data
         let frame_buffer = {
@@ -108,8 +110,9 @@ button 5: Down
 button 6: Left
 button 7: Right
  */
-pub fn handle_input(event_pump: &mut EventPump, controller: &mut Controller) {
+pub fn handle_input(cpu: &mut CPU, state: &mut State, event_pump: &mut EventPump) {
     for event in event_pump.poll_iter() {
+        let controller = &mut cpu.bus.controller;
         match event {
             Event::Quit { .. } => process::exit(0),
 
@@ -118,13 +121,18 @@ pub fn handle_input(event_pump: &mut EventPump, controller: &mut Controller) {
             } => match key {
                 Keycode::L => controller.update_button(0, true),
                 Keycode::K => controller.update_button(1, true),
+
                 Keycode::Space => controller.update_button(2, true),
                 Keycode::Return => controller.update_button(3, true),
+
                 Keycode::W => controller.update_button(4, true),
                 Keycode::S => controller.update_button(5, true),
                 Keycode::A => controller.update_button(6, true),
                 Keycode::D => controller.update_button(7, true),
+
                 Keycode::Escape => process::exit(0),
+                Keycode::N => *state = get_state(cpu),
+                Keycode::M => load_state(cpu, state),
                 _ => (),
             },
 
@@ -133,8 +141,10 @@ pub fn handle_input(event_pump: &mut EventPump, controller: &mut Controller) {
             } => match key {
                 Keycode::L => controller.update_button(0, false),
                 Keycode::K => controller.update_button(1, false),
+
                 Keycode::Space => controller.update_button(2, false),
                 Keycode::Return => controller.update_button(3, false),
+
                 Keycode::W => controller.update_button(4, false),
                 Keycode::S => controller.update_button(5, false),
                 Keycode::A => controller.update_button(6, false),
@@ -144,4 +154,66 @@ pub fn handle_input(event_pump: &mut EventPump, controller: &mut Controller) {
             _ => (),
         }
     }
+}
+
+#[derive(Clone)]
+enum Carts {
+    NROM(NROM),
+}
+
+#[derive(Clone)]
+pub struct State {
+    carts: Carts,
+    controller_state: ControllerState,
+    ppu_state: PpuState,
+    bus_state: BusState,
+    cpu_state: CpuState,
+}
+
+fn get_state(cpu: &mut CPU) -> State {
+    let mapper_id = cpu.bus.ppu.cartridge.get_data().mapper_id;
+    let cartridge = match mapper_id {
+        0 => Carts::NROM(
+            cpu.bus
+                .ppu
+                .cartridge
+                .as_any()
+                .downcast_ref::<NROM>()
+                .unwrap()
+                .to_owned(),
+        ),
+        _ => panic!("Mapper not supported"),
+    };
+
+    let controller_state = Controller::get_state(&cpu.bus.controller);
+    let ppu_state = PPU::get_state(&cpu.bus.ppu);
+    let bus_state = BUS::get_state(&cpu.bus);
+    let cpu_state = CPU::get_state(cpu);
+    State {
+        carts: cartridge,
+        controller_state,
+        ppu_state,
+        bus_state,
+        cpu_state,
+    }
+}
+
+fn load_state(cpu: &mut CPU, state: &State) {
+    let State {
+        carts,
+        controller_state,
+        ppu_state,
+        bus_state,
+        cpu_state,
+    } = state.clone();
+
+    let cart = match carts {
+        Carts::NROM(cart) => cart,
+    };
+
+    let cartridge: Cartridge = Box::new(cart);
+    let ppu = PPU::new_from_state(cartridge, ppu_state);
+    let controller = Controller::new_from_state(controller_state);
+    let bus = BUS::new_from_state(ppu, controller, bus_state);
+    *cpu = CPU::set_state(bus, cpu_state)
 }

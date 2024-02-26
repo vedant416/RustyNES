@@ -1,6 +1,7 @@
 use super::Mapper;
 use crate::rom::ROM;
 
+#[derive(Clone, Debug)]
 pub struct NROM {
     prg_ram: [u8; 0x800],
     rom: ROM,
@@ -55,5 +56,9 @@ impl Mapper for NROM {
 
     fn get_data(&self) -> &ROM {
         &self.rom
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
     }
 }
