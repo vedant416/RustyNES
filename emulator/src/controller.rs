@@ -49,3 +49,28 @@ impl Controller {
         }
     }
 }
+
+#[derive(Clone)]
+pub struct ControllerState {
+    state: u8,
+    index: u8,
+    reset: bool,
+}
+
+impl Controller {
+    pub fn get_state(controller: &Controller) -> ControllerState {
+        ControllerState {
+            state: controller.state,
+            index: controller.index,
+            reset: controller.reset,
+        }
+    }
+
+    pub fn new_from_state(state: ControllerState) -> Controller {
+        Controller {
+            state: state.state,
+            index: state.index,
+            reset: state.reset,
+        }
+    }
+}

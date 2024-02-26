@@ -139,3 +139,70 @@ impl CPU {
         self.cycles += 7;
     }
 }
+
+impl CPU {
+    pub fn get_state(&self) -> CpuState {
+        CpuState {
+            a: self.a,
+            x: self.x,
+            y: self.y,
+            sp: self.sp,
+            pc: self.pc,
+            c: self.c,
+            z: self.z,
+            i: self.i,
+            d: self.d,
+            b: self.b,
+            u: self.u,
+            v: self.v,
+            n: self.n,
+            cycles: self.cycles,
+            stall: self.stall,
+        }
+    }
+
+    pub fn set_state(bus: BUS, state: CpuState) -> CPU {
+        CPU {
+            a: state.a,
+            x: state.x,
+            y: state.y,
+            sp: state.sp,
+            pc: state.pc,
+            c: state.c,
+            z: state.z,
+            i: state.i,
+            d: state.d,
+            b: state.b,
+            u: state.u,
+            v: state.v,
+            n: state.n,
+            cycles: state.cycles,
+            stall: state.stall,
+            bus,
+        }
+    }
+}
+
+#[derive(Clone)]
+pub struct CpuState {
+    pub a: u8,  // Accumulator
+    pub x: u8,  // X register
+    pub y: u8,  // Y register
+    pub sp: u8, // Stack pointer
+
+    pub pc: u16, // Program counter
+
+    // Status register flags
+    pub c: bool, // Carry (bit 0)
+    pub z: bool, // Zero (bit 1)
+    pub i: bool, // Interrupt disable (bit 2)
+    pub d: bool, // Decimal mode (unsupported on NES, bit 3)
+    pub b: bool, // Software interrupt (BRK) (bit 4)
+    pub u: bool, // Unused flag (bit 5)
+    pub v: bool, // Overflow (bit 6)
+    pub n: bool, // Negative (bit 7)
+
+    // state
+    pub cycles: u32,
+    pub stall: u32,
+}

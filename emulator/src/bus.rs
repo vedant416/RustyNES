@@ -56,3 +56,23 @@ impl BUS {
         self.ppu.dma_triggered = true;
     }
 }
+
+#[derive(Clone)]
+pub struct BusState {
+    pub ram: [u8; 0x800],
+}
+
+impl BUS {
+    pub fn get_state(bus: &BUS) -> BusState {
+        BusState { ram: bus.ram }
+    }
+
+    pub fn new_from_state(ppu: PPU, controller: Controller, state: BusState) -> BUS {
+        let BusState { ram } = state;
+        BUS {
+            ram,
+            ppu,
+            controller,
+        }
+    }
+}

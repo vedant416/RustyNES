@@ -5,7 +5,7 @@ use crate::mappers::{nrom::NROM, Mapper};
 // read and write to Cartridge data (ROM file) is done through the mapper
 pub type Cartridge = Box<dyn Mapper>;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct ROM {
     // contents of the ROM file (.nes file)
     pub bytes: Vec<u8>,
@@ -115,7 +115,7 @@ pub fn new_cartridge(bytes: Vec<u8>) -> Cartridge {
     cartridge
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub enum Mirroring {
     Horizontal,
     Vertical,
