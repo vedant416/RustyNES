@@ -1,0 +1,17 @@
+{
+  "name": "rusty_nes_wasm",
+  "collaborators": [
+    "__Vedant__ <vedantpahune@gmail.com>"
+  ],
+  "version": "0.1.0",
+  "files": [
+    "rusty_nes_wasm_bg.wasm",
+    "rusty_nes_wasm.js",
+    "rusty_nes_wasm.d.ts"
+  ],
+  "module": "rusty_nes_wasm.js",
+  "types": "rusty_nes_wasm.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
