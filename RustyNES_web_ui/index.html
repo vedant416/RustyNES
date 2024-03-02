@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RustyNES</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100vw;
+        
+        height: 100vh;
+        background-color: black;
+      }
+      canvas {
+        width: 256px;
+        height: 240px;
+        image-rendering: pixelated;
+      }
+    </style>
+  </head>
+
+  <body>
+    <canvas id="screen"></canvas>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

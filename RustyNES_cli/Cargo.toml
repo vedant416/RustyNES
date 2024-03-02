@@ -1,0 +1,8 @@
+[package]
+name = "rusty_nes_cli"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rusty_nes_core = { path = "../RustyNES_core" }
+sdl2 = "0.36"
