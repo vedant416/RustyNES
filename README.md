@@ -10,8 +10,7 @@ Try it online in your browser: [RustyNES](https://vedant416.github.io/RustyNES/)
 
 ### Super Mario Bros.
 
-<img src="screenshots/image1.png" width=250>
-<img src="screenshots/image2.png" width=250>
+<img src="screenshots/image1.png" width=250> <img src="screenshots/image2.png" width=250>
 
 ## Project Structure
 
