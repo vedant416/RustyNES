@@ -7,6 +7,15 @@ pub struct NROM {
     rom: ROM,
 }
 
+impl Default for NROM {
+    fn default() -> Self {
+        Self {
+            prg_ram: [0; 0x800],
+            rom: ROM::default(),
+        }
+    }
+}
+
 impl NROM {
     pub fn new(rom: ROM) -> Self {
         Self {

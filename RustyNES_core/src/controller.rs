@@ -1,3 +1,4 @@
+#[derive(Default)]
 pub struct Controller {
     state: u8,
     index: u8,

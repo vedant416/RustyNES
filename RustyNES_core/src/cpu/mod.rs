@@ -8,6 +8,7 @@ pub enum Interrupt {
     None,
 }
 
+#[derive(Default)]
 pub struct CPU {
     a: u8,  // Accumulator
     x: u8,  // X register

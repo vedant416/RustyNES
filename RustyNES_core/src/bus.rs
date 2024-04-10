@@ -8,6 +8,16 @@ pub struct BUS {
     pub controller: Controller,
 }
 
+impl Default for BUS {
+    fn default() -> Self {
+        Self {
+            ram: [0; 0x800],
+            ppu: PPU::default(),
+            controller: Controller::default(),
+        }
+    }
+}
+
 impl BUS {
     pub fn new_bus(ppu: PPU, controller: Controller) -> Self {
         Self {

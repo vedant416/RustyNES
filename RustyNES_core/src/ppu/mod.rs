@@ -2,7 +2,7 @@ mod fetch;
 mod io;
 mod render;
 
-use crate::{cpu::Interrupt, rom::Cartridge};
+use crate::{cpu::Interrupt, mappers::nrom::NROM, rom::Cartridge};
 
 pub struct PPU {
     dot: u16,  // 0-340
@@ -62,6 +62,13 @@ pub struct PPU {
     data_latch: u8,
     pub dma_triggered: bool,
     pub cartridge: Cartridge,
+}
+
+impl Default for PPU {
+    fn default() -> Self {
+        let cart: Cartridge = Box::new(NROM::default());
+        Self::new_ppu(cart)
+    }
 }
 
 impl PPU {
@@ -300,7 +307,7 @@ impl PPU {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Default, Clone, Copy)]
 struct Sprite {
     x: u16,
     index: u8,
