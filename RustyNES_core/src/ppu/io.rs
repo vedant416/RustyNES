@@ -14,7 +14,7 @@ impl PPU {
     pub fn read_status(&mut self) -> u8 {
         let res = (self.status & 0b1110_0000) | (self.open_bus & 0b0001_1111);
         self.w = false;
-        self.status = self.status & !0x80;
+        self.status &= !0x80;
         self.update_nmi_state();
         res
     }

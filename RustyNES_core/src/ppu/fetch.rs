@@ -57,19 +57,15 @@ impl PPU {
     fn load_fetched_data(&mut self) {
         let mut new_data: u32 = 0;
         let attr = self.attribute_table_latch << 2;
-
         for _ in 0..8 {
-            let p1 = (self.pattern_table_low_latch & (1 << 7)) >> 7;
-            let p2 = (self.pattern_table_high_latch & (1 << 7)) >> 6;
-            let pattern = p2 | p1;
-
+            let p1 = self.pattern_table_low_latch >> 7;
+            let p2 = self.pattern_table_high_latch >> 7;
+            let pattern = (p2 << 1) | p1;
             self.pattern_table_low_latch <<= 1;
             self.pattern_table_high_latch <<= 1;
             new_data <<= 4;
-
             new_data |= (attr | pattern) as u32;
         }
-
         self.shift_register |= new_data as u64;
     }
 
@@ -95,6 +91,7 @@ impl PPU {
 
             // calculate which row of the sprite is being rendered
             let row = self.line - y;
+
             // flip the row if the sprite is flipped vertically
             let mut row = if flip_vertically { height - row } else { row };
             let mut tile_idx: u16 = self.oam[offset + 1] as u16;
@@ -116,6 +113,7 @@ impl PPU {
             let tile_offset = chr_bank + tile_idx * 16 + row;
             let chr_low = self.read_chr(tile_offset);
             let chr_high = self.read_chr(tile_offset + 8);
+
             // iterate over each pixel in the row
             // and combine the two bit planes into a single byte
             let mut tile_row = [0u8; 8];
@@ -134,15 +132,12 @@ impl PPU {
                 show_bg,
                 tile_row,
             };
-
             count += 1;
-
             if count == 8 {
                 self.set_sprite_overflow();
                 break;
             }
         }
-
         self.sprites_count = count as u8;
     }
 }

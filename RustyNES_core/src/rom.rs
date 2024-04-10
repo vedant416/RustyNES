@@ -133,7 +133,7 @@ impl Mirroring {
             Mirroring::Horizontal => match addr {
                 0x2000..=0x23FF => addr - 0x2000,
                 0x2400..=0x27FF => addr - 0x2400,
-                0x2800..=0x2bFF => addr - 0x2800 + 0x400,
+                0x2800..=0x2BFF => addr - 0x2800 + 0x400,
                 0x2C00..=0x2FFF => addr - 0x2C00 + 0x400,
                 _ => unreachable!("Invalid address for horizontal mirroring: {:#X}", addr),
             },
@@ -141,7 +141,7 @@ impl Mirroring {
             Mirroring::Vertical => match addr {
                 0x2000..=0x23FF => addr - 0x2000,
                 0x2400..=0x27FF => addr - 0x2400 + 0x400,
-                0x2800..=0x2bFF => addr - 0x2800,
+                0x2800..=0x2BFF => addr - 0x2800,
                 0x2C00..=0x2FFF => addr - 0x2C00 + 0x400,
                 _ => unreachable!("Invalid address for vertical mirroring: {:#X}", addr),
             },
@@ -149,7 +149,7 @@ impl Mirroring {
             Mirroring::OneScreenLower => match addr {
                 0x2000..=0x23FF => addr - 0x2000,
                 0x2400..=0x27FF => addr - 0x2400,
-                0x2800..=0x2bFF => addr - 0x2800,
+                0x2800..=0x2BFF => addr - 0x2800,
                 0x2C00..=0x2FFF => addr - 0x2C00,
                 _ => unreachable!(
                     "Invalid address for one screen lower mirroring: {:#X}",
@@ -160,7 +160,7 @@ impl Mirroring {
             Mirroring::OneScreenUpper => match addr {
                 0x2000..=0x23FF => addr - 0x2000 + 0x400,
                 0x2400..=0x27FF => addr - 0x2400 + 0x400,
-                0x2800..=0x2bFF => addr - 0x2800 + 0x400,
+                0x2800..=0x2BFF => addr - 0x2800 + 0x400,
                 0x2C00..=0x2FFF => addr - 0x2C00 + 0x400,
                 _ => unreachable!(
                     "Invalid address for one screen upper mirroring: {:#X}",

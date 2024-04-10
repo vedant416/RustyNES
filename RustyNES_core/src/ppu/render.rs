@@ -41,7 +41,7 @@ impl PPU {
         ///// handle sprite 0 hit /////
         if let Some(sp) = &sp {
             if sp.index == 0 && x < 255 && bg.is_some() && !self.sprite_0_hit() {
-                self.status = self.status | 0x40;
+                self.status |= 0x40;
             }
         }
 
@@ -49,7 +49,7 @@ impl PPU {
         let (r, g, b) = color;
         if x < 256 && y < 240 {
             let offset = (y * 256 + x) * 4;
-            self.frame_buffer[offset + 0] = r;
+            self.frame_buffer[offset] = r;
             self.frame_buffer[offset + 1] = g;
             self.frame_buffer[offset + 2] = b;
             self.frame_buffer[offset + 3] = 255;
@@ -76,7 +76,7 @@ impl PPU {
         // calculate color
         let index = self.frame_palette[index] as usize;
         let color = SYSTEM_PALETTE[index];
-        return Some(color);
+        Some(color)
     }
 
     fn get_sp_color(&mut self) -> Option<SpriteRenderData> {
@@ -105,7 +105,7 @@ impl PPU {
                 index: sprite.index,
             });
         }
-        return None;
+        None
     }
 }
 

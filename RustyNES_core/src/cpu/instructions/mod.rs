@@ -1,6 +1,6 @@
 use super::CPU;
 
-//// Module declarations ///////////////////////
+// Module declarations ///////////////////////
 mod bitwise_instructions;
 mod branch_instructions;
 mod compare_instructions;
@@ -11,9 +11,9 @@ mod memory_instructions;
 mod register_instructions;
 mod stack_instructions;
 
-//// Utils //////////////////
+// Utils //////////////////
 impl CPU {
-    //// IO utils ////
+    // IO utils //////////////////
     fn read(&mut self, addr: u16) -> u8 {
         self.bus.read(addr)
     }
@@ -38,7 +38,7 @@ impl CPU {
         (hi << 8) | lo
     }
 
-    //// Stack utils ////
+    // Stack utils //////////////////
     fn push_8(&mut self, val: u8) {
         self.write(0x100 | self.sp as u16, val);
         self.sp = self.sp.wrapping_sub(1);
@@ -62,7 +62,7 @@ impl CPU {
         (hi << 8) | lo
     }
 
-    //// Status flag update utils ////
+    // Status flag update utils //////////////////
     fn get_flags(&self) -> u8 {
         (self.c as u8)
             | (self.z as u8) << 1
@@ -91,23 +91,18 @@ impl CPU {
     }
 }
 
-//// Addressing Mode //////////////////////////
+// Addressing Mode //////////////////
 pub enum AddressingMode {
     Accumulator,
     Implied,
-
     Immediate,
-
     Relative,
-
     ZeroPage,
     ZeroPageX,
     ZeroPageY,
-
     Absolute,
     AbsoluteX,
     AbsoluteY,
-
     Indirect,
     IndirectX,
     IndirectY,
@@ -190,9 +185,9 @@ impl AddressingMode {
     }
 }
 
-//// Instructions /////////////////////////////
+// Instructions //////////////////
 pub enum Instruction {
-    //// BITWISE ////
+    // BITWISE ////
     AND,
     EOR,
     ORA,
@@ -201,7 +196,7 @@ pub enum Instruction {
     ROL,
     ROR,
 
-    //// BRANCH ////
+    // BRANCH ////
     BPL,
     BMI,
     BVC,
@@ -211,13 +206,13 @@ pub enum Instruction {
     BNE,
     BEQ,
 
-    //// COMPARE ////
+    // COMPARE ////
     CMP,
     CPX,
     CPY,
     BIT,
 
-    //// FLAG ////
+    // FLAG ////
     CLC,
     CLD,
     CLI,
@@ -226,17 +221,17 @@ pub enum Instruction {
     SED,
     SEI,
 
-    //// JUMP ////
+    // JUMP ////
     JMP,
     JSR,
     RTI,
     RTS,
 
-    //// MATH ////
+    // MATH ////
     ADC,
     SBC,
 
-    //// MEMORY ////
+    // MEMORY ////
     LDA,
     LDX,
     LDY,
@@ -246,7 +241,7 @@ pub enum Instruction {
     INC,
     DEC,
 
-    //// REGISTER ////
+    // REGISTER ////
     TAX,
     TAY,
     TXA,
@@ -258,17 +253,17 @@ pub enum Instruction {
     TXS,
     TSX,
 
-    //// STACK ////
+    // STACK ////
     PHA,
     PHP,
     PLA,
     PLP,
 
-    //// OTHER ////
+    // OTHER ////
     BRK,
     NOP,
 
-    //// ILLEGAL ////
+    // ILLEGAL ////
     AHX,
     ALR,
     ANC,
@@ -293,7 +288,7 @@ pub enum Instruction {
 impl Instruction {
     pub fn execute(&self, cpu: &mut CPU, addr: u16, mode: &AddressingMode) {
         match *self {
-            //// BITWISE ////
+            // BITWISE ////
             Instruction::AND => cpu.and(addr),
             Instruction::EOR => cpu.eor(addr),
             Instruction::ORA => cpu.ora(addr),
@@ -303,7 +298,7 @@ impl Instruction {
             Instruction::ROL => cpu.rol(addr, mode),
             Instruction::ROR => cpu.ror(addr, mode),
 
-            //// BRANCH ////
+            // BRANCH ////
             Instruction::BPL => cpu.bpl(addr),
             Instruction::BMI => cpu.bmi(addr),
             Instruction::BVC => cpu.bvc(addr),
@@ -313,13 +308,13 @@ impl Instruction {
             Instruction::BNE => cpu.bne(addr),
             Instruction::BEQ => cpu.beq(addr),
 
-            //// COMPARE ////
+            // COMPARE ////
             Instruction::CMP => cpu.cmp(addr),
             Instruction::CPX => cpu.cpx(addr),
             Instruction::CPY => cpu.cpy(addr),
             Instruction::BIT => cpu.bit(addr),
 
-            //// FLAG ////
+            // FLAG ////
             Instruction::CLC => cpu.clc(),
             Instruction::CLD => cpu.cld(),
             Instruction::CLI => cpu.cli(),
@@ -328,17 +323,17 @@ impl Instruction {
             Instruction::SED => cpu.sed(),
             Instruction::SEI => cpu.sei(),
 
-            //// JUMP ////
+            // JUMP ////
             Instruction::JMP => cpu.jmp(addr),
             Instruction::JSR => cpu.jsr(addr),
             Instruction::RTI => cpu.rti(),
             Instruction::RTS => cpu.rts(),
 
-            //// MATH ////
+            // MATH ////
             Instruction::ADC => cpu.adc(addr),
             Instruction::SBC => cpu.sbc(addr),
 
-            //// MEMORY ////
+            // MEMORY ////
             Instruction::LDA => cpu.lda(addr),
             Instruction::LDX => cpu.ldx(addr),
             Instruction::LDY => cpu.ldy(addr),
@@ -348,7 +343,7 @@ impl Instruction {
             Instruction::INC => cpu.inc(addr),
             Instruction::DEC => cpu.dec(addr),
 
-            //// REGISTER ////
+            // REGISTER ////
             Instruction::TAX => cpu.tax(),
             Instruction::TAY => cpu.tay(),
             Instruction::TXA => cpu.txa(),
@@ -360,17 +355,17 @@ impl Instruction {
             Instruction::TXS => cpu.txs(),
             Instruction::TSX => cpu.tsx(),
 
-            //// STACK ////
+            // STACK ////
             Instruction::PHA => cpu.pha(),
             Instruction::PHP => cpu.php(),
             Instruction::PLA => cpu.pla(),
             Instruction::PLP => cpu.plp(),
 
-            //// OTHER ////
+            // OTHER ////
             Instruction::NOP => (),
             Instruction::BRK => cpu.brk(),
 
-            //// ILLEGAL ////
+            // ILLEGAL ////
             Instruction::AHX => (),
             Instruction::ALR => (),
             Instruction::ANC => (),
@@ -394,7 +389,7 @@ impl Instruction {
     }
 }
 
-//// OPCODES /////////////////////////////////
+// OPCODES /////////////////////////////////
 use AddressingMode::*;
 use Instruction::*;
 
