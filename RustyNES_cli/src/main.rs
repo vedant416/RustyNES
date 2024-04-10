@@ -1,4 +1,3 @@
-use rusty_nes_core::State;
 use rusty_nes_core::CPU;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
@@ -21,8 +20,9 @@ fn main() {
 
     // Create cpu from bytes
     let mut cpu = CPU::new_from_bytes(bytes);
+
     // Save initial state of cpu
-    let mut state = cpu.save();
+    // todo
 
     // Initialize SDL
     let sdl = sdl2::init().unwrap();
@@ -62,7 +62,7 @@ fn main() {
         frame_start_time = Instant::now();
 
         // Handle input
-        handle_input(&mut cpu, &mut state, &mut event_pump);
+        handle_input(&mut cpu, &mut event_pump);
 
         // Get rendering data
         let frame_buffer = cpu.frame_buffer();
@@ -92,7 +92,7 @@ button 5: Down
 button 6: Left
 button 7: Right
  */
-pub fn handle_input(c: &mut CPU, state: &mut State, event_pump: &mut EventPump) {
+pub fn handle_input(c: &mut CPU, event_pump: &mut EventPump) {
     for event in event_pump.poll_iter() {
         match event {
             Event::Quit { .. } => process::exit(0),
@@ -112,8 +112,8 @@ pub fn handle_input(c: &mut CPU, state: &mut State, event_pump: &mut EventPump) 
                 Keycode::D => c.update_button(7, true),
 
                 Keycode::Escape => process::exit(0),
-                Keycode::N => *state = c.save(),
-                Keycode::M => c.load(state),
+                // Keycode::N => *state = c.save(),
+                // Keycode::M => c.load(state),
                 _ => (),
             },
 

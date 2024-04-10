@@ -1,5 +1,7 @@
-impl super::PPU {
-    // read register
+use super::PPU;
+
+// read register
+impl PPU {
     pub fn read_register(&mut self, addr: u16) -> u8 {
         match addr {
             2 => self.read_status(),
@@ -21,7 +23,21 @@ impl super::PPU {
         self.oam[self.oam_addr as usize]
     }
 
-    // write register
+    pub fn read_ppu_data(&mut self) -> u8 {
+        let addr = self.v;
+        let res = match addr {
+            0x0000..=0x1fff => self.read_chr_delayed(addr),
+            0x2000..=0x3eff => self.read_nametable_delayed(addr),
+            0x3f00..=0x3fff => self.read_palette(addr),
+            _ => unreachable!(),
+        };
+        self.v = self.v.wrapping_add(self.vram_addr_increment()) & 0x3fff;
+        res
+    }
+}
+
+// write register
+impl PPU {
     pub fn write_register(&mut self, addr: u16, data: u8) {
         self.open_bus = data;
         match addr {
@@ -49,20 +65,6 @@ impl super::PPU {
 
     pub fn write_oam_addr(&mut self, val: u8) {
         self.oam_addr = val;
-    }
-
-    pub fn read_ppu_data(&mut self) -> u8 {
-        let addr = self.v;
-
-        let res = match addr {
-            0x0000..=0x1fff => self.read_chr_delayed(addr),
-            0x2000..=0x3eff => self.read_nametable_delayed(addr),
-            0x3f00..=0x3fff => self.read_palette(addr),
-            _ => unreachable!(),
-        };
-
-        self.v = self.v.wrapping_add(self.vram_addr_increment()) & 0x3fff;
-        res
     }
 
     pub fn write_oam_data(&mut self, data: u8) {
@@ -96,19 +98,80 @@ impl super::PPU {
 
     pub fn write_ppu_data(&mut self, data: u8) {
         let addr = self.v;
-
         match addr {
             0x0000..=0x1fff => self.write_chr(addr, data),
             0x2000..=0x3eff => self.write_nametable(addr, data),
             0x3f00..=0x3fff => self.write_palette(addr, data),
             _ => unreachable!(),
         }
-
         self.v = self.v.wrapping_add(self.vram_addr_increment()) & 0x3fff;
     }
+}
 
-    // utils to extract info from ppu registers
-    // ctrl bits
+// read/write ppu address space
+impl PPU {
+    // CHR ROM (Cartridge) /////////////////
+    pub fn read_chr(&mut self, addr: u16) -> u8 {
+        self.cartridge.read(addr)
+    }
+
+    pub fn write_chr(&mut self, addr: u16, data: u8) {
+        self.cartridge.write(addr, data);
+    }
+
+    pub fn read_chr_delayed(&mut self, addr: u16) -> u8 {
+        let res = self.data_latch;
+        self.data_latch = self.read_chr(addr);
+        res
+    }
+
+    // NAMETABLE (VRAM) /////////////////
+    pub fn read_nametable(&self, addr: u16) -> u8 {
+        let addr = self.map_vram_addr(addr);
+        self.vram[addr as usize]
+    }
+
+    pub fn write_nametable(&mut self, addr: u16, data: u8) {
+        let addr = self.map_vram_addr(addr);
+        self.vram[addr as usize] = data;
+    }
+
+    pub fn read_nametable_delayed(&mut self, addr: u16) -> u8 {
+        let res = self.data_latch;
+        self.data_latch = self.read_nametable(addr);
+        res
+    }
+
+    // PALETTE /////////////////
+    pub fn write_palette(&mut self, addr: u16, data: u8) {
+        let addr = self.map_palette_addr(addr) as usize;
+        self.frame_palette[addr] = data;
+    }
+
+    pub fn read_palette(&mut self, addr: u16) -> u8 {
+        let addr = self.map_palette_addr(addr) as usize;
+        self.frame_palette[addr]
+    }
+
+    // Mirrorings /////////////////
+    pub fn map_vram_addr(&self, addr: u16) -> u16 {
+        let mirror_mode = &self.cartridge.get_data().mirroring;
+        mirror_mode.get_address(addr)
+    }
+
+    pub fn map_palette_addr(&self, addr: u16) -> u16 {
+        let addr = (addr - 0x3F00) & 31;
+        if addr >= 16 && addr & 3 == 0 {
+            addr - 16
+        } else {
+            addr
+        }
+    }
+}
+
+// utils to extract info from ppu registers
+impl PPU {
+    // ctrl bits /////////////////
     pub fn genrate_nmi(&self) -> bool {
         self.ctrl & 0x80 != 0
     }
@@ -145,7 +208,7 @@ impl super::PPU {
         }
     }
 
-    // mask bits
+    // mask bits /////////////////
     pub fn sp_rendering_allowed(&self) -> bool {
         self.mask & 0x10 != 0
     }
@@ -166,7 +229,7 @@ impl super::PPU {
         self.bg_rendering_allowed() || self.sp_rendering_allowed()
     }
 
-    // status bits
+    // status bits /////////////////
     // vblank flag
     pub fn vblank_started(&self) -> bool {
         self.status & 0x80 != 0
@@ -204,64 +267,5 @@ impl super::PPU {
 
     pub fn clear_sprite_overflow(&mut self) {
         self.status &= !0x20;
-    }
-
-    // read/write ppu address space
-    // CHR ROM (Cartridge)
-    pub fn read_chr(&mut self, addr: u16) -> u8 {
-        self.cartridge.read(addr)
-    }
-
-    pub fn write_chr(&mut self, addr: u16, data: u8) {
-        self.cartridge.write(addr, data);
-    }
-
-    pub fn read_chr_delayed(&mut self, addr: u16) -> u8 {
-        let res = self.data_latch;
-        self.data_latch = self.read_chr(addr);
-        res
-    }
-
-    // NAMETABLE (VRAM)
-    pub fn read_nametable(&self, addr: u16) -> u8 {
-        let addr = self.map_vram_addr(addr);
-        self.vram[addr as usize]
-    }
-
-    pub fn write_nametable(&mut self, addr: u16, data: u8) {
-        let addr = self.map_vram_addr(addr);
-        self.vram[addr as usize] = data;
-    }
-
-    pub fn read_nametable_delayed(&mut self, addr: u16) -> u8 {
-        let res = self.data_latch;
-        self.data_latch = self.read_nametable(addr);
-        res
-    }
-
-    // PALETTE
-    pub fn write_palette(&mut self, addr: u16, data: u8) {
-        let addr = self.map_palette_addr(addr) as usize;
-        self.frame_palette[addr] = data;
-    }
-
-    pub fn read_palette(&mut self, addr: u16) -> u8 {
-        let addr = self.map_palette_addr(addr) as usize;
-        self.frame_palette[addr]
-    }
-
-    // Mirrorings
-    pub fn map_vram_addr(&self, addr: u16) -> u16 {
-        let mirror_mode = &self.cartridge.get_data().mirroring;
-        mirror_mode.get_address(addr)
-    }
-
-    pub fn map_palette_addr(&self, addr: u16) -> u16 {
-        let addr = (addr - 0x3F00) & 31;
-        if addr >= 16 && addr & 3 == 0 {
-            addr - 16
-        } else {
-            addr
-        }
     }
 }

@@ -1,7 +1,9 @@
-use crate::{cpu::Interrupt, rom::Cartridge};
 mod fetch;
 mod io;
 mod render;
+
+use crate::{cpu::Interrupt, rom::Cartridge};
+
 pub struct PPU {
     dot: u16,  // 0-340
     line: u16, // 0-261, 0-239=visible, 240=post, 241-260=vblank, 261=pre
@@ -61,33 +63,8 @@ pub struct PPU {
     pub dma_triggered: bool,
     pub cartridge: Cartridge,
 }
-#[derive(Clone, Copy)]
-struct Sprite {
-    x: u16,
-    index: u8,
-    show_bg: bool,
-    tile_row: [u8; 8],
-}
 
-impl Sprite {
-    fn new() -> Self {
-        Self {
-            x: 0,
-            index: 0,
-            show_bg: false,
-            tile_row: [0; 8],
-        }
-    }
-}
 impl PPU {
-    pub fn frame_buffer_ref(&self) -> &[u8; 256 * 240 * 4] {
-        self.frame_buffer.as_ref()
-    }
-
-    pub fn frame_buffer_ptr(&self) -> *const u8 {
-        self.frame_buffer.as_ptr()
-    }
-
     pub fn new_ppu(cartridge: Cartridge) -> PPU {
         let mut ppu = PPU {
             // state
@@ -141,9 +118,7 @@ impl PPU {
         ppu.line = 241;
         ppu
     }
-}
 
-impl PPU {
     pub fn step(&mut self) {
         // which line?
         let visible_line = self.line < 240;
@@ -234,7 +209,7 @@ impl PPU {
         }
     }
 
-    //// nmi handling /////////////////////////////
+    // nmi handling /////////////////////////////
     fn update_nmi_state(&mut self) {
         let nmi_current_state = self.current_nmi_state();
 
@@ -249,7 +224,7 @@ impl PPU {
         self.genrate_nmi() && self.vblank_started()
     }
 
-    //// increment and copy //////////////////////
+    // increment and copy //////////////////////
     fn increment_and_copy(&mut self, fetch_line: bool, fetch_dot: bool, preline: bool) {
         if fetch_line {
             ///// increment coarse x //////
@@ -325,141 +300,21 @@ impl PPU {
     }
 }
 
-#[derive(Clone)]
-pub struct PpuState {
-    dot: u16,  // 0-340
-    line: u16, // 0-261, 0-239=visible, 240=post, 241-260=vblank, 261=pre
-
-    // PPU Registers
-    pub ctrl: u8,
-    pub mask: u8,
-    pub status: u8,
-    pub oam_addr: u8,
-
-    // Loopy Registers
-    v: u16,  // Current VRAM address (15 bits)
-    t: u16,  // Temporary VRAM address (15 bits)
-    x: u8,   // Fine X scroll (3 bits)
-    w: bool, // First or second write toggle (1 bit)
-
-    // shift register stuff
-    /*
-        pixel color is 4 bits:
-            ( px = 4 bits )
-
-        tile is 8x8 px (single tile row is 8px)
-            ( row_size = 8*4 = 32 bits )
-
-        shift_register stores pixels for 2 tile rows
-            ( 32 bits * 2 = 64 bits )
-            shift_register size = 64 bits
-    */
-    shift_register: u64,
-    // latches to store fetched data before loading into shift register
-    nametable_latch: u8,
-    attribute_table_latch: u8,
-    pattern_table_low_latch: u8,
-    pattern_table_high_latch: u8,
-
-    // ppu memory
-    vram: [u8; 0x800],
-    frame_palette: [u8; 32],
-    oam: [u8; 256],
-    sprites: [Sprite; 8],
-    sprites_count: u8,
-
-    // frame management
-    odd: bool, // odd frame flag
-    frame_counter: u64,
-    pub frame_buffer: Box<[u8; 256 * 240 * 4]>,
-    pub frame_complete: bool,
-
-    // nmi
-    nmi_previous_state: bool,
-    nmi_triggering_allowed: bool,
-    nmi_triggered: bool,
-
-    open_bus: u8,
-    data_latch: u8,
-    pub dma_triggered: bool,
+#[derive(Clone, Copy)]
+struct Sprite {
+    x: u16,
+    index: u8,
+    show_bg: bool,
+    tile_row: [u8; 8],
 }
 
-impl PPU {
-    pub fn get_state(&self) -> PpuState {
-        PpuState {
-            dot: self.dot,
-            line: self.line,
-
-            ctrl: self.ctrl,
-            mask: self.mask,
-            status: self.status,
-            oam_addr: self.oam_addr,
-
-            v: self.v,
-            t: self.t,
-            x: self.x,
-            w: self.w,
-
-            shift_register: self.shift_register,
-            nametable_latch: self.nametable_latch,
-            attribute_table_latch: self.attribute_table_latch,
-            pattern_table_low_latch: self.pattern_table_low_latch,
-            pattern_table_high_latch: self.pattern_table_high_latch,
-
-            vram: self.vram,
-            frame_palette: self.frame_palette,
-            oam: self.oam,
-            sprites: self.sprites,
-            sprites_count: self.sprites_count,
-
-            odd: self.odd,
-            frame_counter: self.frame_counter,
-            frame_buffer: self.frame_buffer.clone(),
-            frame_complete: self.frame_complete,
-
-            nmi_previous_state: self.nmi_previous_state,
-            nmi_triggering_allowed: self.nmi_triggering_allowed,
-            nmi_triggered: self.nmi_triggered,
-
-            open_bus: self.open_bus,
-            data_latch: self.data_latch,
-            dma_triggered: self.dma_triggered,
-        }
-    }
-
-    pub fn new_from_state(cartridge: Cartridge, ppu_state: PpuState) -> PPU {
-        PPU {
-            dot: ppu_state.dot,
-            line: ppu_state.line,
-            ctrl: ppu_state.ctrl,
-            mask: ppu_state.mask,
-            status: ppu_state.status,
-            oam_addr: ppu_state.oam_addr,
-            v: ppu_state.v,
-            t: ppu_state.t,
-            x: ppu_state.x,
-            w: ppu_state.w,
-            shift_register: ppu_state.shift_register,
-            nametable_latch: ppu_state.nametable_latch,
-            attribute_table_latch: ppu_state.attribute_table_latch,
-            pattern_table_low_latch: ppu_state.pattern_table_low_latch,
-            pattern_table_high_latch: ppu_state.pattern_table_high_latch,
-            vram: ppu_state.vram,
-            frame_palette: ppu_state.frame_palette,
-            oam: ppu_state.oam,
-            sprites: ppu_state.sprites,
-            sprites_count: ppu_state.sprites_count,
-            odd: ppu_state.odd,
-            frame_counter: ppu_state.frame_counter,
-            frame_buffer: ppu_state.frame_buffer,
-            frame_complete: ppu_state.frame_complete,
-            nmi_previous_state: ppu_state.nmi_previous_state,
-            nmi_triggering_allowed: ppu_state.nmi_triggering_allowed,
-            nmi_triggered: ppu_state.nmi_triggered,
-            open_bus: ppu_state.open_bus,
-            data_latch: ppu_state.data_latch,
-            dma_triggered: ppu_state.dma_triggered,
-            cartridge,
+impl Sprite {
+    fn new() -> Self {
+        Self {
+            x: 0,
+            index: 0,
+            show_bg: false,
+            tile_row: [0; 8],
         }
     }
 }

@@ -1,5 +1,7 @@
-impl super::PPU {
-    //// fetch background //////////////////////////
+use super::PPU;
+
+impl PPU {
+    // fetch background //////////////////////////
     pub fn fetch_bg(&mut self) {
         // before fetching:
         // shift the shift register by size of one pixel (4 bits)
@@ -71,7 +73,7 @@ impl super::PPU {
         self.shift_register |= new_data as u64;
     }
 
-    //// fetch_sprites ////////////////////////////
+    // fetch_sprites ////////////////////////////
     pub fn fetch_sprites(&mut self) {
         let mut count = 0;
         let height = self.sprite_size() as u16;

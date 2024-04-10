@@ -1,10 +1,6 @@
-struct SpriteRenderData {
-    color: (u8, u8, u8),
-    index: u8,
-    show_bg: bool,
-}
+use super::PPU;
 
-impl super::PPU {
+impl PPU {
     pub fn render(&mut self) {
         /*
         pixel is not generated on dot 1
@@ -111,6 +107,12 @@ impl super::PPU {
         }
         return None;
     }
+}
+
+struct SpriteRenderData {
+    color: (u8, u8, u8),
+    index: u8,
+    show_bg: bool,
 }
 
 // SYSTEM_PALETTE does not change
