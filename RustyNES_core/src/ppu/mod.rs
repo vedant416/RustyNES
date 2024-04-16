@@ -2,7 +2,7 @@ mod fetch;
 mod io;
 mod render;
 
-use crate::{cpu::Interrupt, mappers::nrom::NROM, rom::Cartridge};
+use crate::{buffer::Buffer, cpu::Interrupt, mappers::nrom::NROM, rom::Cartridge};
 
 pub struct PPU {
     dot: u16,  // 0-340
@@ -323,5 +323,117 @@ impl Sprite {
             show_bg: false,
             tile_row: [0; 8],
         }
+    }
+}
+
+impl Sprite {
+    pub fn encode(&self, buffer: &mut Buffer) {
+        buffer.write_u16(self.x);
+        buffer.write_u8(self.index);
+        buffer.write_bool(self.show_bg);
+        buffer.write_u8_arr(&self.tile_row);
+    }
+
+    pub fn decode(&mut self, buffer: &mut Buffer) {
+        let x = buffer.read_u16();
+        let index = buffer.read_u8();
+        let show_bg = buffer.read_bool();
+        let mut tile_row = [0; 8];
+        buffer.read_u8_arr(&mut tile_row);
+
+        self.x = x;
+        self.index = index;
+        self.show_bg = show_bg;
+        self.tile_row = tile_row;
+    }
+}
+
+impl PPU {
+    pub fn encode(&self, buffer: &mut Buffer) {
+        buffer.write_u16(self.dot);
+        buffer.write_u16(self.line);
+
+        buffer.write_u8(self.ctrl);
+        buffer.write_u8(self.mask);
+        buffer.write_u8(self.status);
+        buffer.write_u8(self.oam_addr);
+
+        buffer.write_u16(self.v);
+        buffer.write_u16(self.t);
+        buffer.write_u8(self.x);
+        buffer.write_bool(self.w);
+
+        buffer.write_u64(self.shift_register);
+
+        buffer.write_u8(self.nametable_latch);
+        buffer.write_u8(self.attribute_table_latch);
+        buffer.write_u8(self.pattern_table_low_latch);
+        buffer.write_u8(self.pattern_table_high_latch);
+
+        buffer.write_u8_arr(&self.vram);
+        buffer.write_u8_arr(&self.frame_palette);
+        buffer.write_u8_arr(&self.oam);
+
+        buffer.write_u8(self.sprites_count);
+        for sprite in self.sprites.iter() {
+            sprite.encode(buffer);
+        }
+
+        buffer.write_bool(self.odd);
+        buffer.write_u64(self.frame_counter);
+        buffer.write_u8_arr(self.frame_buffer.as_ref());
+        buffer.write_bool(self.frame_complete);
+
+        buffer.write_bool(self.nmi_previous_state);
+        buffer.write_bool(self.nmi_triggering_allowed);
+        buffer.write_bool(self.nmi_triggered);
+
+        buffer.write_u8(self.open_bus);
+        buffer.write_u8(self.data_latch);
+        buffer.write_bool(self.dma_triggered);
+    }
+
+    pub fn decode(&mut self, buffer: &mut Buffer) {
+        self.dot = buffer.read_u16();
+        self.line = buffer.read_u16();
+
+        self.ctrl = buffer.read_u8();
+        self.mask = buffer.read_u8();
+        self.status = buffer.read_u8();
+        self.oam_addr = buffer.read_u8();
+
+        self.v = buffer.read_u16();
+        self.t = buffer.read_u16();
+        self.x = buffer.read_u8();
+        self.w = buffer.read_bool();
+
+        self.shift_register = buffer.read_u64();
+
+        self.nametable_latch = buffer.read_u8();
+        self.attribute_table_latch = buffer.read_u8();
+        self.pattern_table_low_latch = buffer.read_u8();
+        self.pattern_table_high_latch = buffer.read_u8();
+
+        buffer.read_u8_arr(&mut self.vram);
+        buffer.read_u8_arr(&mut self.frame_palette);
+        buffer.read_u8_arr(&mut self.oam);
+
+        self.sprites_count = buffer.read_u8();
+        for sprite in self.sprites.iter_mut() {
+            sprite.decode(buffer);
+        }
+
+        self.odd = buffer.read_bool();
+        self.frame_counter = buffer.read_u64();
+        buffer.read_u8_arr(self.frame_buffer.as_mut());
+        self.frame_complete = buffer.read_bool();
+
+        self.nmi_previous_state = buffer.read_bool();
+        self.nmi_triggering_allowed = buffer.read_bool();
+        self.nmi_triggered = buffer.read_bool();
+
+        self.open_bus = buffer.read_u8();
+        self.data_latch = buffer.read_u8();
+        self.dma_triggered = buffer.read_bool();
     }
 }

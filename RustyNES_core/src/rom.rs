@@ -1,4 +1,5 @@
-use crate::mappers::{nrom::NROM, Mapper};
+use crate::{buffer::Buffer, mappers::{nrom::NROM, Mapper}};
+
 
 // mapper is a chip on the cartridge that controls
 // how the program code and graphics data are read from the PRG ROM and CHR ROM
@@ -114,6 +115,56 @@ impl ROM {
             _ => panic!("Mapper not implemented: {}", rom.mapper_id),
         };
         cartridge
+    }
+
+    pub fn encode(&self, buffer: &mut Buffer) {
+        buffer.write_u64(self.bytes.len() as u64);
+        buffer.write_u8_arr(&self.bytes);
+        buffer.write_u8(self.prg_rom_banks);
+        buffer.write_u8(self.chr_rom_banks);
+        buffer.write_u32(self.prg_rom_start as u32);
+        buffer.write_u32(self.chr_rom_start as u32);
+        buffer.write_u8(self.mapper_id);
+        match self.mirroring {
+            Mirroring::Horizontal => buffer.write_u8(0),
+            Mirroring::Vertical => buffer.write_u8(1),
+            Mirroring::OneScreenLower => buffer.write_u8(2),
+            Mirroring::OneScreenUpper => buffer.write_u8(3),
+            Mirroring::FourScreen => buffer.write_u8(4),
+        }
+        buffer.write_bool(self.trainer);
+    }
+
+    pub fn decode(buffer: &mut Buffer) -> ROM {
+        // decode nes file bytes
+        let len = buffer.read_u64() as usize;
+        let mut bytes = vec![0; len];
+        buffer.read_u8_arr(&mut bytes);
+        // decode rest
+        let prg_rom_banks = buffer.read_u8();
+        let chr_rom_banks = buffer.read_u8();
+        let prg_rom_start = buffer.read_u32() as usize;
+        let chr_rom_start = buffer.read_u32() as usize;
+        let mapper_id = buffer.read_u8();
+        let mirroring = match buffer.read_u8() {
+            0 => Mirroring::Horizontal,
+            1 => Mirroring::Vertical,
+            2 => Mirroring::OneScreenLower,
+            3 => Mirroring::OneScreenUpper,
+            4 => Mirroring::FourScreen,
+            _ => panic!("Invalid mirroring mode"),
+        };
+        let trainer = buffer.read_bool();
+        ROM {
+            bytes,
+            prg_rom_banks,
+            chr_rom_banks,
+            prg_rom_start,
+            chr_rom_start,
+            mapper_id,
+            mirroring,
+            trainer,
+        }
     }
 }
 

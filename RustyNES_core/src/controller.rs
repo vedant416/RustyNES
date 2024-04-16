@@ -1,3 +1,5 @@
+use crate::buffer;
+
 #[derive(Default)]
 pub struct Controller {
     state: u8,
@@ -48,5 +50,19 @@ impl Controller {
         } else {
             self.state &= !(1 << index);
         }
+    }
+}
+
+impl Controller {
+    pub fn encode(&self, buffer: &mut buffer::Buffer) {
+        buffer.write_u8(self.state);
+        buffer.write_u8(self.index);
+        buffer.write_bool(self.reset);
+    }
+
+    pub fn decode(&mut self, buffer: &mut buffer::Buffer) {
+        self.state = buffer.read_u8();
+        self.index = buffer.read_u8();
+        self.reset = buffer.read_bool();
     }
 }

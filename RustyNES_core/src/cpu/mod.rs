@@ -1,3 +1,9 @@
+use crate::{
+    buffer::{self, Buffer},
+    mappers::nrom::NROM,
+    rom::ROM,
+};
+
 use self::instructions::{OPCODE, OPCODES};
 use super::bus::BUS;
 mod instructions;
@@ -27,7 +33,7 @@ pub struct CPU {
     v: bool, // Overflow (bit 6)
     n: bool, // Negative (bit 7)
 
-    // state
+    // buffer
     cycles: u32,
     stall: u32,
     // for communication with other components
@@ -138,5 +144,75 @@ impl CPU {
         self.i = true; // set interrupt disable flag to true
         self.pc = self.read_16(vector); // set program counter to interrupt vector
         self.cycles += 7;
+    }
+}
+
+// Save and Load /////////////////////
+impl CPU {
+    fn encode_cpu(&self, buffer: &mut buffer::Buffer) {
+        buffer.write_u8(self.a);
+        buffer.write_u8(self.x);
+        buffer.write_u8(self.y);
+        buffer.write_u8(self.sp);
+        buffer.write_u16(self.pc);
+
+        buffer.write_bool(self.c);
+        buffer.write_bool(self.z);
+        buffer.write_bool(self.i);
+        buffer.write_bool(self.d);
+        buffer.write_bool(self.b);
+        buffer.write_bool(self.u);
+        buffer.write_bool(self.v);
+        buffer.write_bool(self.n);
+
+        buffer.write_u32(self.cycles);
+        buffer.write_u32(self.stall);
+    }
+
+    fn decode_cpu(&mut self, buffer: &mut buffer::Buffer) {
+        self.a = buffer.read_u8();
+        self.x = buffer.read_u8();
+        self.y = buffer.read_u8();
+        self.sp = buffer.read_u8();
+        self.pc = buffer.read_u16();
+
+        self.c = buffer.read_bool();
+        self.z = buffer.read_bool();
+        self.i = buffer.read_bool();
+        self.d = buffer.read_bool();
+        self.b = buffer.read_bool();
+        self.u = buffer.read_bool();
+        self.v = buffer.read_bool();
+        self.n = buffer.read_bool();
+
+        self.cycles = buffer.read_u32();
+        self.stall = buffer.read_u32();
+    }
+
+    pub fn encode(&mut self, buffer: &mut buffer::Buffer) {
+        *buffer = Buffer::new_buffer();
+        self.bus.ppu.cartridge.get_rom().encode(buffer);
+        self.bus.ppu.cartridge.encode(buffer);
+        self.bus.ppu.encode(buffer);
+        self.bus.controller.encode(buffer);
+        self.bus.encode(buffer);
+        self.encode_cpu(buffer);
+    }
+
+    pub fn decode(&mut self, buffer: &mut buffer::Buffer) {
+        let rom = ROM::decode(buffer);
+        // set correct cartridge type based on mapper id
+        // then save the cartridge
+        self.bus.ppu.cartridge = match rom.mapper_id {
+            0 => Box::new(NROM::new(rom)),
+            _ => panic!("Mapper not supported"),
+        };
+        self.bus.ppu.cartridge.decode(buffer);
+        self.bus.ppu.decode(buffer);
+        self.bus.controller.decode(buffer);
+        self.bus.decode(buffer);
+        self.decode_cpu(buffer);
+        // reset read index after decoding
+        buffer.index = 0;
     }
 }

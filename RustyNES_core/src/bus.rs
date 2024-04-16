@@ -1,3 +1,5 @@
+use crate::buffer;
+
 use super::controller::Controller;
 use super::ppu::PPU;
 
@@ -64,5 +66,15 @@ impl BUS {
             self.ppu.write_oam_data(data);
         }
         self.ppu.dma_triggered = true;
+    }
+}
+
+impl BUS {
+    pub fn encode(&self, buffer: &mut buffer::Buffer) {
+        buffer.write_u8_arr(&self.ram);
+    }
+
+    pub fn decode(&mut self, buffer: &mut buffer::Buffer) {
+        buffer.read_u8_arr(&mut self.ram);
     }
 }

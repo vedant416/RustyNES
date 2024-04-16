@@ -1,3 +1,4 @@
+use rusty_nes_core::buffer::Buffer;
 use rusty_nes_core::CPU;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
@@ -5,6 +6,7 @@ use sdl2::pixels::PixelFormatEnum;
 use sdl2::EventPump;
 use std::env::args;
 use std::fs::read;
+use std::fs::write;
 use std::process;
 use std::thread;
 use std::time::Duration;
@@ -13,16 +15,31 @@ use std::time::Instant;
 fn main() {
     let args: Vec<String> = args().collect();
     if args.len() != 2 {
-        panic!("Usage: rusty_nes_cli <path-to-rom-file>");
+        panic!("Usage: rusty_nes_cli <path to \".nes\" file or \".rustynes_sav\" file>");
     }
-    let rom_path = &args[1];
-    let bytes = read(rom_path).expect("failed to read ROM file");
+    // read file path
+    let path = &args[1];
+    println!("args: {:?}", args);
+    println!("file_path: {}", path);
 
-    // Create cpu from bytes
-    let mut cpu = CPU::new_from_bytes(bytes);
+    // Load ROM or save file
+    let mut cpu;
+    let buffer = &mut Buffer::new_buffer();
+    if path.ends_with(".rustynes_sav") {
+        cpu = CPU::default();
+        let bytes = read(path).expect("Failed to read save file");
+        buffer.data = bytes;
+        cpu.decode(buffer);
+    } else if path.ends_with(".nes") {
+        let bytes = read(path).expect("Failed to read ROM file");
+        cpu = CPU::new_from_bytes(bytes);
+    } else {
+        panic!("Invalid file type. Please provide a .nes ROM file or .rustynes_sav");
+    }
 
     // Save initial state of cpu
-    // todo
+    let buffer = &mut Buffer::new_buffer();
+    cpu.encode(buffer);
 
     // Initialize SDL
     let sdl = sdl2::init().unwrap();
@@ -62,7 +79,7 @@ fn main() {
         frame_start_time = Instant::now();
 
         // Handle input
-        handle_input(&mut cpu, &mut event_pump);
+        handle_input(&mut cpu, buffer, &mut event_pump);
 
         // Get rendering data
         let frame_buffer = cpu.frame_buffer();
@@ -83,16 +100,16 @@ fn main() {
 }
 
 /*
-button 0: A
-button 1: B
-button 2: Select
-button 3: Start
-button 4: Up
-button 5: Down
-button 6: Left
-button 7: Right
- */
-pub fn handle_input(c: &mut CPU, event_pump: &mut EventPump) {
+   button 0: A
+   button 1: B
+   button 2: Select
+   button 3: Start
+   button 4: Up
+   button 5: Down
+   button 6: Left
+   button 7: Right
+*/
+pub fn handle_input(c: &mut CPU, buffer: &mut Buffer, event_pump: &mut EventPump) {
     for event in event_pump.poll_iter() {
         match event {
             Event::Quit { .. } => process::exit(0),
@@ -112,8 +129,13 @@ pub fn handle_input(c: &mut CPU, event_pump: &mut EventPump) {
                 Keycode::D => c.update_button(7, true),
 
                 Keycode::Escape => process::exit(0),
-                // Keycode::N => *state = c.save(),
-                // Keycode::M => c.load(state),
+                Keycode::N => {
+                    c.encode(buffer);
+                    write("save.rustynes_sav", &buffer.data).expect("error writing file");
+                }
+                Keycode::M => {
+                    c.decode(buffer);
+                }
                 _ => (),
             },
 

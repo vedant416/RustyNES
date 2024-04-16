@@ -1,5 +1,5 @@
 use super::Mapper;
-use crate::rom::ROM;
+use crate::{buffer, rom::ROM};
 
 #[derive(Clone, Debug)]
 pub struct NROM {
@@ -63,11 +63,19 @@ impl Mapper for NROM {
         }
     }
 
-    fn get_data(&self) -> &ROM {
+    fn get_rom(&self) -> &ROM {
         &self.rom
     }
 
     fn as_any(&self) -> &dyn std::any::Any {
         self
+    }
+
+    fn encode(&self, buffer: &mut buffer::Buffer) {
+        buffer.write_u8_arr(&self.prg_ram);
+    }
+
+    fn decode(&mut self, buffer: &mut buffer::Buffer) {
+        buffer.read_u8_arr(&mut self.prg_ram);
     }
 }

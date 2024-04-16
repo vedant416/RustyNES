@@ -155,7 +155,7 @@ impl PPU {
 
     // Mirrorings /////////////////
     pub fn map_vram_addr(&self, addr: u16) -> u16 {
-        let mirror_mode = &self.cartridge.get_data().mirroring;
+        let mirror_mode = &self.cartridge.get_rom().mirroring;
         mirror_mode.get_address(addr)
     }
 
