@@ -5,6 +5,7 @@ pub mod cpu;
 pub mod mappers;
 pub mod ppu;
 pub mod rom;
+pub mod buffer;
 
 use bus::BUS;
 use controller::Controller;
