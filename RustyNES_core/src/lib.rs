@@ -1,4 +1,5 @@
 #![allow(clippy::upper_case_acronyms)]
+pub mod apu;
 pub mod buffer;
 pub mod bus;
 pub mod controller;
