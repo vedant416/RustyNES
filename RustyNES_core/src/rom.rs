@@ -1,5 +1,7 @@
-use crate::{buffer::Buffer, mappers::{nrom::NROM, Mapper}};
-
+use crate::{
+    buffer::Buffer,
+    mappers::{nrom::NROM, Mapper},
+};
 
 // mapper is a chip on the cartridge that controls
 // how the program code and graphics data are read from the PRG ROM and CHR ROM

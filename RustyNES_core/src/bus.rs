@@ -1,3 +1,4 @@
+use crate::apu::APU;
 use crate::buffer;
 
 use super::controller::Controller;
@@ -8,6 +9,7 @@ pub struct BUS {
     ram: [u8; 0x800], // 2KB of RAM
     pub ppu: PPU,
     pub controller: Controller,
+    pub apu: APU,
 }
 
 impl Default for BUS {
@@ -16,6 +18,7 @@ impl Default for BUS {
             ram: [0; 0x800],
             ppu: PPU::default(),
             controller: Controller::default(),
+            apu: APU::default(),
         }
     }
 }
@@ -26,6 +29,7 @@ impl BUS {
             ram: [0; 0x800],
             ppu,
             controller,
+            apu: APU::new(),
         }
     }
 
@@ -37,7 +41,8 @@ impl BUS {
             // addr & 7 masks the address to 0-7
             0x2000..=0x3FFF => self.ppu.read_register(addr & 7),
             0x4016 => self.controller.read(),
-            0x4000..=0x401F => 0, // APU (not implemented yet)
+            0x4000..=0x4017 => self.apu.read(addr),
+            0x4018..=0x401F => 0, // unused
             0x4020..=0xFFFF => self.ppu.cartridge.read(addr),
         }
     }
@@ -50,8 +55,8 @@ impl BUS {
             // addr & 7 masks the address to 0-7
             0x2000..=0x3FFF => self.ppu.write_register(addr & 7, val),
             0x4014 => self.dma(val),
-            0x4016 => self.controller.write(val),
-            0x4000..=0x401F => (), // APU (not implemented yet)
+            0x4000..=0x4017 => self.apu.write(addr, val),
+            0x4018..=0x401F => (), // unused
             0x4020..=0xFFFF => self.ppu.cartridge.write(addr, val),
         }
     }
