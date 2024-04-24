@@ -17,14 +17,7 @@ impl NES {
     }
 
     pub fn step(&mut self) {
-        while !self.cpu.bus.ppu.frame_complete() {
-            let cpu_cycles = self.cpu.step();
-            let ppu_cycles = cpu_cycles * 3;
-
-            for _ in 0..ppu_cycles {
-                self.cpu.bus.ppu.step();
-            }
-        }
+        self.cpu.step_till_next_frame();
     }
 
     pub fn frame_buffer_pointer(&self) -> *const u8 {

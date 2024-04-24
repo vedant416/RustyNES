@@ -18,7 +18,7 @@ impl Default for BUS {
             ram: [0; 0x800],
             ppu: PPU::default(),
             controller: Controller::default(),
-            apu: APU::default(),
+            apu: APU::new(),
         }
     }
 }

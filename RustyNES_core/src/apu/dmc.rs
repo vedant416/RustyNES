@@ -6,12 +6,10 @@ impl Dmc {
         Self {}
     }
 
-    fn step(&mut self) {
-        todo!();
-    }
+    fn step(&mut self) {}
 
-    fn output(&self) -> u8 {
-        todo!();
+    fn output(&self) -> f32 {
+        0.0
     }
 
     pub fn write0(&mut self, val: u8) {}

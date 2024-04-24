@@ -10,15 +10,36 @@ mod noise;
 mod square;
 mod triangle;
 
-#[derive(Default)]
+const CPU_FREQ: f32 = 1789773.0;
+const SAMPLE_RATE: f32 = 48000.0;
+const BUFFER_SIZE: usize = 0x2000;
+
 pub struct APU {
+    // channels
     square1: Square,
     square2: Square,
     triangle: Triangle,
     noise: Noise,
     dmc: Dmc,
+
+    // timing
+    cycle: u32,
+    cycles_per_sample: f32, // cycles required to generate one sample
+    sample_count: u32,      // total samples generated so far
+
+    // frame counter
+    frame_counter: u32,
+    four_step_mode: bool, // frame step mode: 4-step or 5-step
+    irq_triggered: bool,
+    irq_disabled: bool,
+
+    // buffer
+    buffer_start: usize,             // start of buffer
+    buffer_end: usize,               // end of buffer
+    buffer: Box<[f32; BUFFER_SIZE]>, // circular buffer
 }
 
+// Step /////
 impl APU {
     pub fn new() -> Self {
         Self {
@@ -27,15 +48,36 @@ impl APU {
             triangle: Triangle::new(),
             noise: Noise::new(),
             dmc: Dmc::new(),
+
+            cycle: 0,
+            cycles_per_sample: CPU_FREQ / SAMPLE_RATE,
+            sample_count: 0,
+
+            frame_counter: 0,
+            four_step_mode: true,
+            irq_triggered: false,
+            irq_disabled: false,
+
+            buffer_start: 0,
+            buffer_end: 0,
+            buffer: Box::new([0.0; BUFFER_SIZE]),
         }
     }
 
-    fn step(&mut self) {}
+    pub fn step(&mut self) {}
 
-    fn output(&self) -> u8 {
-        0
+    pub fn load_samples(&self, out: &mut [f32]) {}
+}
+
+// Sound output /////
+impl APU {
+    fn output(&self) -> f32 {
+        0.0
     }
+}
 
+// Read/Write /////
+impl APU {
     pub fn read(&self, addr: u16) -> u8 {
         match addr {
             0x4015 => self.read_status(),

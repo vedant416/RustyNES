@@ -6,7 +6,7 @@ use crate::{
 // mapper is a chip on the cartridge that controls
 // how the program code and graphics data are read from the PRG ROM and CHR ROM
 // read and write to Cartridge data (ROM file) is done through the mapper
-pub type Cartridge = Box<dyn Mapper>;
+pub type Cartridge = Box<dyn Mapper + Send>;
 
 #[derive(Default, Clone, Debug)]
 pub struct ROM {

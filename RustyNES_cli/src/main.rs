@@ -1,5 +1,7 @@
 use rusty_nes_core::buffer::Buffer;
 use rusty_nes_core::CPU;
+use sdl2::audio::AudioCallback;
+use sdl2::audio::AudioSpecDesired;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::PixelFormatEnum;
@@ -11,6 +13,18 @@ use std::process;
 use std::thread;
 use std::time::Duration;
 use std::time::Instant;
+
+struct NES<'a> {
+    cpu: &'a mut CPU,
+}
+
+impl<'a> AudioCallback for NES<'a> {
+    type Channel = f32;
+
+    fn callback(&mut self, out: &mut [f32]) {
+        self.cpu.load_samples(out);
+    }
+}
 
 fn main() {
     let args: Vec<String> = args().collect();
@@ -43,6 +57,8 @@ fn main() {
 
     // Initialize SDL
     let sdl = sdl2::init().unwrap();
+
+    // Set up video
     let video_subsystem = sdl.video().unwrap();
     let window = video_subsystem
         .window("nes", (256 * 3) as u32, (240 * 3) as u32)
@@ -55,8 +71,6 @@ fn main() {
         .accelerated()
         .build()
         .expect("could not create canvas");
-
-    // 3x scale canvas
     canvas.set_scale(3_f32, 3_f32).unwrap();
 
     // Create texture
@@ -65,7 +79,18 @@ fn main() {
         .create_texture_target(PixelFormatEnum::ABGR8888, 256_u32, 240_u32)
         .unwrap();
 
-    // Event handling
+    let audio_subsystem = sdl.audio().unwrap();
+    let desired_audio_spec = AudioSpecDesired {
+        freq: Some(48000.0 as i32),
+        channels: Some(1), // mono,
+        samples: Some(1024),
+    };
+    let audio_device = audio_subsystem
+        .open_playback(None, &desired_audio_spec, |_spec| NES { cpu: &mut cpu })
+        .unwrap();
+    audio_device.resume();
+
+    // Set up event handling
     let mut event_pump = sdl.event_pump().unwrap();
 
     // For 60 fps emulation
@@ -82,7 +107,8 @@ fn main() {
         handle_input(&mut cpu, buffer, &mut event_pump);
 
         // Get rendering data
-        let frame_buffer = cpu.frame_buffer();
+        cpu.step_till_next_frame();
+        let frame_buffer = cpu.frame_buffer_ref();
 
         // Update texture
         texture.update(None, frame_buffer, 256 * 4).unwrap();

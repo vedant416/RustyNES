@@ -27,16 +27,24 @@ impl CPU {
         self.bus.controller.update_button(index, pressed)
     }
 
-    pub fn frame_buffer(&mut self) -> &[u8] {
-        // Run emulator until frame is complete
-        // todo: refactor ppu to use while loop till we new frame is complete
+    pub fn step_till_next_frame(&mut self) {
         while !self.bus.ppu.frame_complete() {
             let cpu_cycles = self.step();
             let ppu_cycles = cpu_cycles * 3; // 1 CPU cycle = 3 PPU cycles
             for _ in 0..ppu_cycles {
                 self.bus.ppu.step();
             }
+            for _ in 0..cpu_cycles {
+                self.bus.apu.step();
+            }
         }
+    }
+
+    pub fn frame_buffer_ref(&self) -> &[u8] {
         self.bus.ppu.frame_buffer.as_ref()
+    }
+
+    pub fn load_samples(&self, out: &mut [f32]) {
+        self.bus.apu.load_samples(out)
     }
 }
