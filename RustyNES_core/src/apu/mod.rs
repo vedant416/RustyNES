@@ -9,6 +9,7 @@ mod dmc;
 mod noise;
 mod square;
 mod triangle;
+mod units;
 
 const CPU_FREQ: f32 = 1789773.0;
 const SAMPLE_RATE: f32 = 48000.0;
@@ -64,15 +65,57 @@ impl APU {
         }
     }
 
-    pub fn step(&mut self) {}
+    pub fn step(&mut self) {
+        self.cycle += 1;
+        self.triangle.step();
+        if self.cycle % 2 == 0 {
+            self.square1.step();
+            self.square2.step();
+            self.noise.step();
+            self.dmc.step();
+            self.step_frame_counter();
+        }
 
-    pub fn load_samples(&self, out: &mut [f32]) {}
+        // apu runs very fast compared to device sampling rate
+        // so we need to downsample the output
+        // we downsample output by writing to buffer at specific intervals i.e. cycles_per_sample
+        let required_sample_count = (self.cycle as f32 / self.cycles_per_sample) as u32;
+        if self.sample_count < required_sample_count {
+            self.write_buffer(); 
+        }
+    }
+
+    fn step_frame_counter(&mut self) {
+        self.frame_counter += 1;
+        match self.frame_counter {
+            _ => {}
+        }
+    }
 }
 
 // Sound output /////
 impl APU {
     fn output(&self) -> f32 {
+        let s1 = self.square1.output();
+        let s2 = self.square2.output();
+        let t = self.triangle.output();
+        let n = self.noise.output();
+        let d = self.dmc.output();
+        let out1 = 0.00752 * (s1 + s2);
+        let out2 = (0.00851 * t) + (0.00494 * n) + (0.00335 * d);
+        let output = out1 + out2;
+        output
+    }
+
+    fn read_buffer(&self) -> f32 {
         0.0
+    }
+    fn write_buffer(&self) {}
+
+    pub fn load_samples(&self, buffer: &mut [f32]) {
+        for i in 0..buffer.len() {
+            buffer[i] = self.read_buffer();
+        }
     }
 }
 

@@ -6,9 +6,9 @@ impl Dmc {
         Self {}
     }
 
-    fn step(&mut self) {}
+    pub fn step(&mut self) {}
 
-    fn output(&self) -> f32 {
+    pub fn output(&self) -> f32 {
         0.0
     }
 

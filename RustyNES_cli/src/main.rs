@@ -21,8 +21,8 @@ struct NES<'a> {
 impl<'a> AudioCallback for NES<'a> {
     type Channel = f32;
 
-    fn callback(&mut self, out: &mut [f32]) {
-        self.cpu.load_samples(out);
+    fn callback(&mut self, buffer: &mut [f32]) {
+        self.cpu.load_samples(buffer);
     }
 }
 
