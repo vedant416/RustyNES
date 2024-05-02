@@ -81,51 +81,43 @@ impl APU {
         // we downsample output by writing to buffer at specific intervals i.e. cycles_per_sample
         let required_sample_count = (self.cycle as f32 / self.cycles_per_sample) as u32;
         if self.sample_count < required_sample_count {
-            self.write_buffer(); 
+            self.write_buffer();
         }
     }
 
     fn step_frame_counter(&mut self) {
         self.frame_counter += 1;
         match self.frame_counter {
+            3729 => self.step_quarter_frame(),
+            7457 => self.step_half_frame(),
+            11186 => self.step_quarter_frame(),
+            14915 if self.four_step_mode => {
+                self.step_half_frame();
+                self.frame_counter = 0;
+                if !self.irq_disabled {
+                    self.irq_triggered = true;
+                }
+            }
+            18641 if !self.four_step_mode => {
+                self.step_half_frame();
+                self.frame_counter = 0;
+            }
             _ => {}
         }
     }
-}
 
-// Sound output /////
-impl APU {
-    fn output(&self) -> f32 {
-        let s1 = self.square1.output();
-        let s2 = self.square2.output();
-        let t = self.triangle.output();
-        let n = self.noise.output();
-        let d = self.dmc.output();
-        let out1 = 0.00752 * (s1 + s2);
-        let out2 = (0.00851 * t) + (0.00494 * n) + (0.00335 * d);
-        let output = out1 + out2;
-        output
-    }
+    fn step_quarter_frame(&mut self) {}
 
-    fn read_buffer(&self) -> f32 {
-        0.0
-    }
-    fn write_buffer(&self) {}
-
-    pub fn load_samples(&self, buffer: &mut [f32]) {
-        for i in 0..buffer.len() {
-            buffer[i] = self.read_buffer();
-        }
-    }
+    fn step_half_frame(&mut self) {}
 }
 
 // Read/Write /////
 impl APU {
     pub fn read(&self, addr: u16) -> u8 {
-        match addr {
-            0x4015 => self.read_status(),
-            _ => 0,
+        if addr == 0x4015 {
+            return self.read_status();
         }
+        return 0;
     }
 
     pub fn write(&mut self, addr: u16, val: u8) {
@@ -150,7 +142,7 @@ impl APU {
 
             // noise
             0x400C => self.noise.write0(val),
-            // 0x400D, // unused
+            0x400D => {}
             0x400E => self.noise.write1(val),
             0x400F => self.noise.write2(val),
 
@@ -177,4 +169,31 @@ impl APU {
     fn write_control(&self, val: u8) {}
 
     fn write_frame_counter(&self, val: u8) {}
+}
+
+// Sound output /////
+impl APU {
+    fn output(&self) -> f32 {
+        let s1 = self.square1.output();
+        let s2 = self.square2.output();
+        let t = self.triangle.output();
+        let n = self.noise.output();
+        let d = self.dmc.output();
+        let out1 = 0.00752 * (s1 + s2);
+        let out2 = (0.00851 * t) + (0.00494 * n) + (0.00335 * d);
+        let output = out1 + out2;
+        output
+    }
+
+    fn read_buffer(&self) -> f32 {
+        0.0
+    }
+
+    fn write_buffer(&self) {}
+
+    pub fn load_samples(&self, buffer: &mut [f32]) {
+        for i in 0..buffer.len() {
+            buffer[i] = self.read_buffer();
+        }
+    }
 }

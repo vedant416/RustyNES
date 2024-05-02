@@ -1,6 +1,7 @@
 #[derive(Default)]
 pub struct Dmc {}
 
+// Step /////
 impl Dmc {
     pub fn new() -> Self {
         Self {}
@@ -11,6 +12,15 @@ impl Dmc {
     pub fn output(&self) -> f32 {
         0.0
     }
+}
+
+// Read/Write /////
+impl Dmc {
+    fn read_status(&self) -> u8 {
+        0
+    }
+
+    fn write_control(&self, val: u8) {}
 
     pub fn write0(&mut self, val: u8) {}
 
