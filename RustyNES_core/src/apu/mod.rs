@@ -106,14 +106,24 @@ impl APU {
         }
     }
 
-    fn step_quarter_frame(&mut self) {}
+    fn step_quarter_frame(&mut self) {
+        self.square1.step_quarter_frame();
+        self.square2.step_quarter_frame();
+        self.triangle.step_quarter_frame();
+        self.noise.step_quarter_frame();
+    }
 
-    fn step_half_frame(&mut self) {}
+    fn step_half_frame(&mut self) {
+        self.square1.step_half_frame();
+        self.square2.step_half_frame();
+        self.triangle.step_half_frame();
+        self.noise.step_half_frame();
+    }
 }
 
 // Read/Write /////
 impl APU {
-    pub fn read(&self, addr: u16) -> u8 {
+    pub fn read(&mut self, addr: u16) -> u8 {
         if addr == 0x4015 {
             return self.read_status();
         }
@@ -136,9 +146,9 @@ impl APU {
 
             // triangle
             0x4008 => self.triangle.write0(val),
-            0x4009 => self.triangle.write1(val),
-            0x400A => self.triangle.write2(val),
-            0x400B => self.triangle.write3(val),
+            0x4009 => {}
+            0x400A => self.triangle.write1(val),
+            0x400B => self.triangle.write2(val),
 
             // noise
             0x400C => self.noise.write0(val),
@@ -162,13 +172,72 @@ impl APU {
         }
     }
 
-    fn read_status(&self) -> u8 {
-        0
+    fn read_status(&mut self) -> u8 {
+        // read channel status and irq status into single byte
+        let mut status = 0;
+
+        // set bit 1 (0000_0001)
+        if self.square1.read_status() {
+            status |= 0x1;
+        }
+
+        // set bit 2 (0000_0010)
+        if self.square2.read_status() {
+            status |= 0x2;
+        }
+
+        // set bit 3 (0000_0100)
+        if self.triangle.read_status() {
+            status |= 0x4;
+        }
+
+        // set bit 4 (0000_1000)
+        if self.noise.read_status() {
+            status |= 0x8;
+        }
+
+        // set bit 5 (0001_0000)
+        if self.dmc.read_status() {
+            status |= 0x10;
+        }
+
+        // set bit 7 (0100_0000)
+        if self.irq_triggered {
+            status |= 0x40;
+        }
+
+        // set bit 8 (1000_0000)
+        if self.dmc.irq_triggered {
+            status |= 0x80;
+        }
+
+        self.irq_triggered = false;
+
+        return status;
     }
 
-    fn write_control(&self, val: u8) {}
+    fn write_control(&mut self, val: u8) {
+        self.square1.write_control(val & 0x1 != 0);
+        self.square2.write_control(val & 0x2 != 0);
+        self.triangle.write_control(val & 0x4 != 0);
+        self.noise.write_control(val & 0x8 != 0);
+        self.dmc.write_control(val & 0x10 != 0);
+    }
 
-    fn write_frame_counter(&self, val: u8) {}
+    fn write_frame_counter(&mut self, val: u8) {
+        self.frame_counter = 0;
+        // bit 7 (0100_0000)
+        self.irq_disabled = val & 0x40 != 0;
+        if self.irq_disabled {
+            self.irq_triggered = false;
+        }
+        // bit 8 (1000_0000)
+        // 0: 4-step mode, 1: 5-step mode
+        self.four_step_mode = val & 0x80 == 0;
+        if !self.four_step_mode {
+            self.step_half_frame();
+        }
+    }
 }
 
 // Sound output /////

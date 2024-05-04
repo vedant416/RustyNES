@@ -1,10 +1,13 @@
 #[derive(Default)]
-pub struct Dmc {}
+pub struct Dmc {
+    enabled: bool,
+    pub irq_triggered: bool,
+}
 
 // Step /////
 impl Dmc {
     pub fn new() -> Self {
-        Self {}
+        Dmc::default()
     }
 
     pub fn step(&mut self) {}
@@ -16,11 +19,14 @@ impl Dmc {
 
 // Read/Write /////
 impl Dmc {
-    fn read_status(&self) -> u8 {
-        0
+    pub fn read_status(&self) -> bool {
+        false
     }
 
-    fn write_control(&self, val: u8) {}
+    pub fn write_control(&mut self, enabled: bool) {
+        self.enabled = enabled;
+        self.irq_triggered = false;
+    }
 
     pub fn write0(&mut self, val: u8) {}
 
