@@ -44,7 +44,7 @@ impl CPU {
         self.bus.ppu.frame_buffer.as_ref()
     }
 
-    pub fn load_samples(&self, buffer: &mut [f32]) {
+    pub fn load_samples(&mut self, buffer: &mut [f32]) {
         self.bus.apu.load_samples(buffer)
     }
 }

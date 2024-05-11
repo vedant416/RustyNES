@@ -82,6 +82,8 @@ impl APU {
         let required_sample_count = (self.cycle as f32 / self.cycles_per_sample) as u32;
         if self.sample_count < required_sample_count {
             self.write_buffer();
+            // increment sample count after writing to buffer
+            self.sample_count += 1;
         }
     }
 
@@ -254,15 +256,33 @@ impl APU {
         output
     }
 
-    fn read_buffer(&self) -> f32 {
-        0.0
+    fn read_buffer(&mut self) -> f32 {
+        let sample = self.buffer[self.buffer_start];
+        self.buffer_start = (self.buffer_start + 1) % BUFFER_SIZE;
+        sample
     }
 
-    fn write_buffer(&self) {}
+    fn write_buffer(&mut self) {
+        self.buffer[self.buffer_end] = self.output();
+        self.buffer_end = (self.buffer_start + 1) % BUFFER_SIZE;
+    }
 
-    pub fn load_samples(&self, buffer: &mut [f32]) {
+    pub fn load_samples(&mut self, buffer: &mut [f32]) {
+        let available_samples = {
+            let start = self.buffer_start;
+            let end = self.buffer_end;
+            if start < end {
+                end - start
+            } else {
+                BUFFER_SIZE - (start - end)
+            }
+        };
         for i in 0..buffer.len() {
-            buffer[i] = self.read_buffer();
+            if i < available_samples {
+                buffer[i] = self.read_buffer();
+            } else {
+                buffer[i] = 0.0;
+            }
         }
     }
 }
