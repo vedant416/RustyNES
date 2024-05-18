@@ -9,7 +9,7 @@ mod dmc;
 mod noise;
 mod square;
 mod triangle;
-mod units;
+pub mod units;
 
 const CPU_FREQ: f32 = 1789773.0;
 const SAMPLE_RATE: f32 = 48000.0;
@@ -44,8 +44,8 @@ pub struct APU {
 impl APU {
     pub fn new() -> Self {
         Self {
-            square1: Square::new(),
-            square2: Square::new(),
+            square1: Square::new(0),
+            square2: Square::new(1),
             triangle: Triangle::new(),
             noise: Noise::new(),
             dmc: Dmc::new(),
