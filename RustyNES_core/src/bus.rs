@@ -55,6 +55,7 @@ impl BUS {
             // addr & 7 masks the address to 0-7
             0x2000..=0x3FFF => self.ppu.write_register(addr & 7, val),
             0x4014 => self.dma(val),
+            0x4016 => self.controller.write(val),
             0x4000..=0x4017 => self.apu.write(addr, val),
             0x4018..=0x401F => (), // unused
             0x4020..=0xFFFF => self.ppu.cartridge.write(addr, val),
