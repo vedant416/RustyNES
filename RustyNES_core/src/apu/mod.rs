@@ -264,7 +264,7 @@ impl APU {
 
     fn write_buffer(&mut self) {
         self.buffer[self.buffer_end] = self.output();
-        self.buffer_end = (self.buffer_start + 1) % BUFFER_SIZE;
+        self.buffer_end = (self.buffer_end + 1) % BUFFER_SIZE;
     }
 
     pub fn load_samples(&mut self, buffer: &mut [f32]) {
