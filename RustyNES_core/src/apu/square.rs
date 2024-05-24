@@ -22,7 +22,7 @@ pub struct Square {
     sweep_reload: bool,
     sweep_negate: bool,
     sweep_shift: u8,
-    mute: bool,
+    sweep_mute: bool,
 
     // other units
     timer: Timer,
@@ -38,7 +38,11 @@ impl Square {
         square
     }
 
-    pub fn step(&mut self) {}
+    pub fn step(&mut self) {
+        if self.timer.step() {
+            self.duty_cycle = (self.duty_cycle + 1) & 7;
+        }
+    }
 
     pub fn step_quarter_frame(&mut self) {
         self.envelope.step();
