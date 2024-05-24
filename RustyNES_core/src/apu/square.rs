@@ -73,7 +73,7 @@ impl Square {
         if self.sweep_enabled && self.sweep_counter == 0 && !self.sweep_mute {
             self.timer.period = period;
         }
-        if self.sweep_reload || self.sweep_counter == 0 {
+        if self.sweep_counter == 0 || self.sweep_reload {
             self.sweep_counter = self.sweep_period;
             self.sweep_reload = false;
         } else {
@@ -127,14 +127,14 @@ impl Square {
     }
 
     pub fn write2(&mut self, val: u8) {
-        self.timer.period = (self.timer.period & 0b0000_0111_0000_0000) | (val as u16);
+        self.timer.period = (self.timer.period & 0xFF00) | val as u16;
     }
 
     pub fn write3(&mut self, val: u8) {
         self.duty_cycle = 0;
         let period = (val & 0b111) as u16;
         let period = period << 8;
-        self.timer.period = (self.timer.period & 0b1111_1000_1111_1111) | period;
+        self.timer.period = (self.timer.period & 0x00FF) | period;
         self.length_counter.set(val >> 3);
     }
 }
