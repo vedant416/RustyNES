@@ -82,7 +82,12 @@ impl Square {
     }
 
     pub fn output(&self) -> f32 {
-        0.0
+        if !self.enabled || self.sweep_mute || self.length_counter.counter == 0 {
+            return 0.0;
+        }
+        let duty = SQUARE[self.duty_mode as usize][self.duty_cycle as usize];
+        let output = self.envelope.output();
+        (duty * output) as f32
     }
 }
 
