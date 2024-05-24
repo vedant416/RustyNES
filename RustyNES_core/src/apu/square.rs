@@ -54,7 +54,32 @@ impl Square {
         self.length_counter.step();
     }
 
-    fn step_sweep(&mut self) {}
+    fn calculate_period(&self) -> u16 {
+        let change_amount = self.timer.period >> self.sweep_shift;
+        if self.sweep_negate {
+            if self.id == 0 {
+                self.timer.period.saturating_sub(change_amount + 1)
+            } else {
+                self.timer.period.saturating_sub(change_amount)
+            }
+        } else {
+            self.timer.period + change_amount
+        }
+    }
+
+    fn step_sweep(&mut self) {
+        let period = self.calculate_period();
+        self.sweep_mute = period > 0x7FF || self.timer.period < 8;
+        if self.sweep_enabled && self.sweep_counter == 0 && !self.sweep_mute {
+            self.timer.period = period;
+        }
+        if self.sweep_reload || self.sweep_counter == 0 {
+            self.sweep_counter = self.sweep_period;
+            self.sweep_reload = false;
+        } else {
+            self.sweep_counter -= 1;
+        }
+    }
 
     pub fn output(&self) -> f32 {
         0.0
