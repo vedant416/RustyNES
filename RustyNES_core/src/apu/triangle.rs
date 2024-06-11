@@ -21,14 +21,36 @@ pub struct Triangle {
 // Step /////
 impl Triangle {
     pub fn new() -> Self {
-        Triangle::default()
+        Self::default()
     }
 
-    pub fn step(&mut self) {}
+    pub fn step(&mut self) {
+        if self.timer.step() && self.counter != 0 && self.length_counter.counter != 0 {
+            self.duty_cycle = (self.duty_cycle + 1) & 31;
+        }
+    }
 
-    pub fn step_quarter_frame(&mut self) {}
+    pub fn step_quarter_frame(&mut self) {
+        self.step_linear_counter();
+    }
 
-    pub fn step_half_frame(&mut self) {}
+    pub fn step_half_frame(&mut self) {
+        self.step_linear_counter();
+        self.length_counter.step();
+    }
+
+    fn step_linear_counter(&mut self) {
+        if self.reload_flag {
+            self.counter = self.reload_value;
+        } else if self.counter > 0 {
+            self.counter -= 1;
+        }
+
+        // if control_flag is clear, reload flag is cleared
+        if !self.control_flag {
+            self.reload_flag = false;
+        }
+    }
 
     pub fn output(&self) -> f32 {
         0.0

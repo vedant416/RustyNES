@@ -253,7 +253,7 @@ impl APU {
         let out1 = 0.00752 * (s1 + s2);
         let out2 = (0.00851 * t) + (0.00494 * n) + (0.00335 * d);
         let output = out1 + out2;
-        output
+        output * 0.2
     }
 
     fn read_buffer(&mut self) -> f32 {
