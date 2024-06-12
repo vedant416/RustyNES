@@ -53,23 +53,37 @@ impl Triangle {
     }
 
     pub fn output(&self) -> f32 {
-        0.0
+        TRIANGLE[self.duty_cycle as usize] as f32
     }
 }
 
 // Read/Write /////
 impl Triangle {
     pub fn read_status(&self) -> bool {
-        false
+        self.length_counter.counter != 0
     }
 
     pub fn write_control(&mut self, enabled: bool) {
+        if !enabled {
+            self.length_counter.counter = 0;
+        }
         self.enabled = enabled;
     }
 
-    pub fn write0(&mut self, val: u8) {}
+    pub fn write0(&mut self, val: u8) {
+        self.control_flag = val & 0x80 != 0;
+        self.reload_value = val & 0b0111_1111;
+    }
 
-    pub fn write1(&mut self, val: u8) {}
+    pub fn write1(&mut self, val: u8) {
+        self.timer.period = (self.timer.period & 0xFF00) | val as u16;
+    }
 
-    pub fn write2(&mut self, val: u8) {}
+    pub fn write2(&mut self, val: u8) {
+        self.reload_flag = true;
+        let period = (val & 0b111) as u16;
+        let period = period << 8;
+        self.timer.period = (self.timer.period & 0x00FF) | period;
+        self.length_counter.set(val >> 3);
+    }
 }
