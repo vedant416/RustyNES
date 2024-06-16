@@ -26,8 +26,8 @@ pub struct Square {
 
     // other units
     timer: Timer,
-    length_counter: LengthCounter,
     envelope: Envelope,
+    length_counter: LengthCounter,
 }
 
 // Step /////
@@ -114,8 +114,8 @@ impl Square {
 
         let period = val & 0b1111;
         self.envelope.period = period;
-        self.envelope.constant_mode = val & 0x10 != 0;
         self.envelope.constant_volume = period;
+        self.envelope.constant_mode = val & 0x10 != 0;
     }
 
     pub fn write1(&mut self, val: u8) {
