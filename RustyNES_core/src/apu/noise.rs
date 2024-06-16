@@ -56,16 +56,34 @@ impl Noise {
 // Read/Write /////
 impl Noise {
     pub fn read_status(&self) -> bool {
-        false
+        self.length_counter.counter != 0
     }
 
     pub fn write_control(&mut self, enabled: bool) {
+        if !enabled {
+            self.length_counter.counter = 0;
+        }
         self.enabled = enabled;
     }
 
-    pub fn write0(&mut self, val: u8) {}
+    pub fn write0(&mut self, val: u8) {
+        let halt = val & 0x20 != 0;
+        self.length_counter.enabled = !halt;
+        self.envelope.loop_mode = halt;
 
-    pub fn write1(&mut self, val: u8) {}
+        let period = val & 0b1111;
+        self.envelope.period = period;
+        self.envelope.constant_volume = period;
+        self.envelope.constant_mode = val & 0x10 != 0;
+    }
 
-    pub fn write2(&mut self, val: u8) {}
+    pub fn write1(&mut self, val: u8) {
+        self.mode = val & 0x80 != 0;
+        self.timer.period = NOISE[(val & 0b1111) as usize];
+    }
+
+    pub fn write2(&mut self, val: u8) {
+        self.envelope.start = true;
+        self.length_counter.set(val >> 3);
+    }
 }
