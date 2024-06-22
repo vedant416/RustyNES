@@ -1,5 +1,4 @@
 use crate::{
-    apu,
     buffer::{self, Buffer},
     mappers::nrom::NROM,
     rom::ROM,

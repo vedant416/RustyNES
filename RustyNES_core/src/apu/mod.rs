@@ -277,11 +277,13 @@ impl APU {
                 BUFFER_SIZE - (start - end)
             }
         };
+        let mut last_sample = 0.0;
         for i in 0..buffer.len() {
             if i < available_samples {
-                buffer[i] = self.read_buffer();
+                last_sample = self.read_buffer();
+                buffer[i] = last_sample
             } else {
-                buffer[i] = 0.0;
+                buffer[i] = last_sample
             }
         }
     }
