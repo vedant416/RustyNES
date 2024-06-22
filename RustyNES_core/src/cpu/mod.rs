@@ -1,4 +1,5 @@
 use crate::{
+    apu,
     buffer::{self, Buffer},
     mappers::nrom::NROM,
     rom::ROM,
@@ -135,7 +136,9 @@ impl CPU {
             self.interrupt(0xFFFA)
         } else {
             if !self.i {
-                if self.bus.ppu.cartridge.irq_triggered() {
+                let cartridge_irq = self.bus.ppu.cartridge.irq_triggered();
+                let apu_irq = self.bus.apu.irq_triggered();
+                if cartridge_irq || apu_irq {
                     self.interrupt(0xFFFE);
                 }
             }
