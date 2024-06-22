@@ -131,10 +131,14 @@ impl CPU {
     }
 
     fn handle_interrupt(&mut self) {
-        match self.bus.ppu.interrupt_triggered() {
-            Interrupt::NMI => self.interrupt(0xFFFA),
-            Interrupt::IRQ => self.interrupt(0xFFFE),
-            Interrupt::None => {}
+        if self.bus.ppu.nmi_triggered() {
+            self.interrupt(0xFFFA)
+        } else {
+            if !self.i {
+                if self.bus.ppu.cartridge.irq_triggered() {
+                    self.interrupt(0xFFFE);
+                }
+            }
         }
     }
 

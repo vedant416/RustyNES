@@ -286,3 +286,10 @@ impl APU {
         }
     }
 }
+
+// Other /////
+impl APU {
+    pub fn irq_triggered(&mut self) -> bool {
+        self.irq_triggered || self.dmc.irq_triggered
+    }
+}
