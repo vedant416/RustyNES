@@ -2,7 +2,7 @@ mod fetch;
 mod io;
 mod render;
 
-use crate::{buffer::Buffer, cpu::Interrupt, mappers::nrom::NROM, rom::Cartridge};
+use crate::{buffer::Buffer, cpu::Interrupt, mappers::Mapper0, rom::Cartridge};
 
 pub struct PPU {
     dot: u16,  // 0-340
@@ -66,7 +66,7 @@ pub struct PPU {
 
 impl Default for PPU {
     fn default() -> Self {
-        let cart: Cartridge = Box::new(NROM::default());
+        let cart: Cartridge = Box::new(Mapper0::default());
         Self::new_ppu(cart)
     }
 }

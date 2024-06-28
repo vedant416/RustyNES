@@ -1,6 +1,6 @@
 use crate::{
     buffer::Buffer,
-    mappers::{nrom::NROM, Mapper},
+    mappers::{Mapper, Mapper0},
 };
 
 // mapper is a chip on the cartridge that controls
@@ -113,7 +113,7 @@ impl ROM {
         };
 
         let cartridge: Cartridge = match mapper_id {
-            0 => Box::new(NROM::new(rom)),
+            0 => Box::new(Mapper0::new(rom)),
             _ => panic!("Mapper not implemented: {}", rom.mapper_id),
         };
         cartridge

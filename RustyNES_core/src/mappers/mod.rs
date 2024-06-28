@@ -1,4 +1,9 @@
-pub mod nrom;
+mod mapper0;
+mod mapper2;
+mod mapper4;
+
+pub use mapper0::Mapper0;
+
 use crate::{buffer, rom::ROM};
 pub trait Mapper {
     fn read(&mut self, addr: u16) -> u8;

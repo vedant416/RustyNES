@@ -1,6 +1,6 @@
 use crate::{
     buffer::{self, Buffer},
-    mappers::nrom::NROM,
+    mappers::Mapper0,
     rom::ROM,
 };
 
@@ -210,7 +210,7 @@ impl CPU {
         // set correct cartridge type based on mapper id
         // then save the cartridge
         self.bus.ppu.cartridge = match rom.mapper_id {
-            0 => Box::new(NROM::new(rom)),
+            0 => Box::new(Mapper0::new(rom)),
             _ => panic!("Mapper not supported"),
         };
         self.bus.ppu.cartridge.decode(buffer);
