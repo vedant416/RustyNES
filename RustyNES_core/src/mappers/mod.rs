@@ -3,6 +3,7 @@ mod mapper2;
 mod mapper4;
 
 pub use mapper0::Mapper0;
+pub use mapper2::Mapper2;
 
 use crate::{buffer, rom::ROM};
 pub trait Mapper {

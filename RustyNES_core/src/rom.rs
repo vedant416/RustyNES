@@ -1,6 +1,6 @@
 use crate::{
     buffer::Buffer,
-    mappers::{Mapper, Mapper0},
+    mappers::{Mapper, Mapper0, Mapper2},
 };
 
 // mapper is a chip on the cartridge that controls
@@ -112,10 +112,7 @@ impl ROM {
             trainer,
         };
 
-        let cartridge: Cartridge = match mapper_id {
-            0 => Box::new(Mapper0::new(rom)),
-            _ => panic!("Mapper not implemented: {}", rom.mapper_id),
-        };
+        let cartridge: Cartridge = create_cartridge(mapper_id, rom);
         cartridge
     }
 
@@ -167,6 +164,14 @@ impl ROM {
             mirroring,
             trainer,
         }
+    }
+}
+
+pub fn create_cartridge(mapper_id: u8, rom: ROM) -> Cartridge {
+    match mapper_id {
+        0 => Box::new(Mapper0::new(rom)),
+        2 => Box::new(Mapper2::new(rom)),
+        _ => panic!("Mapper not implemented: {}", rom.mapper_id),
     }
 }
 

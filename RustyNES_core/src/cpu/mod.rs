@@ -1,7 +1,6 @@
 use crate::{
     buffer::{self, Buffer},
-    mappers::Mapper0,
-    rom::ROM,
+    rom::{create_cartridge, ROM},
 };
 
 use self::instructions::{OPCODE, OPCODES};
@@ -207,12 +206,7 @@ impl CPU {
 
     pub fn decode(&mut self, buffer: &mut buffer::Buffer) {
         let rom = ROM::decode(buffer);
-        // set correct cartridge type based on mapper id
-        // then save the cartridge
-        self.bus.ppu.cartridge = match rom.mapper_id {
-            0 => Box::new(Mapper0::new(rom)),
-            _ => panic!("Mapper not supported"),
-        };
+        self.bus.ppu.cartridge = create_cartridge(rom.mapper_id, rom);
         self.bus.ppu.cartridge.decode(buffer);
         self.bus.ppu.decode(buffer);
         self.bus.controller.decode(buffer);
