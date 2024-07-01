@@ -8,6 +8,8 @@ pub mod mappers;
 pub mod ppu;
 pub mod rom;
 
+pub use apu::BUFFER_SIZE;
+pub use apu::SAMPLE_RATE;
 use bus::BUS;
 use controller::Controller;
 pub use cpu::CPU;

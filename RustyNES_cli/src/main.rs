@@ -1,5 +1,6 @@
 use rusty_nes_core::buffer::Buffer;
 use rusty_nes_core::CPU;
+use rusty_nes_core::SAMPLE_RATE;
 use sdl2::audio::AudioCallback;
 use sdl2::audio::AudioSpecDesired;
 use sdl2::event::Event;
@@ -81,7 +82,7 @@ fn main() {
 
     let audio_subsystem = sdl.audio().unwrap();
     let desired_audio_spec = AudioSpecDesired {
-        freq: Some(48000.0 as i32),
+        freq: Some(SAMPLE_RATE as i32),
         channels: Some(1), // mono,
         samples: Some(1024),
     };

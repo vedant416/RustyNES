@@ -63,12 +63,8 @@ impl Mapper for Mapper0 {
         }
     }
 
-    fn get_rom(&self) -> &ROM {
+    fn data(&self) -> &ROM {
         &self.rom
-    }
-
-    fn as_any(&self) -> &dyn std::any::Any {
-        self
     }
 
     fn encode(&self, buffer: &mut buffer::Buffer) {

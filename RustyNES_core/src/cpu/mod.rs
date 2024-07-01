@@ -196,7 +196,7 @@ impl CPU {
 
     pub fn encode(&mut self, buffer: &mut buffer::Buffer) {
         *buffer = Buffer::new_buffer();
-        self.bus.ppu.cartridge.get_rom().encode(buffer);
+        self.bus.ppu.cartridge.data().encode(buffer);
         self.bus.ppu.cartridge.encode(buffer);
         self.bus.ppu.encode(buffer);
         self.bus.controller.encode(buffer);
