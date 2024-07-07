@@ -37,7 +37,10 @@ impl CPU {
                 self.bus.ppu.step();
             }
             for _ in 0..cpu_cycles {
-                self.bus.apu.step();
+                // todo: only read data when needed
+                let addr = self.bus.apu.dmc.current_address;
+                let dmc_data = self.bus.read(addr);
+                self.bus.apu.step(dmc_data);
             }
         }
     }

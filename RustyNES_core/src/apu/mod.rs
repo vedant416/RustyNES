@@ -21,7 +21,7 @@ pub struct APU {
     square2: Square,
     triangle: Triangle,
     noise: Noise,
-    dmc: Dmc,
+    pub dmc: Dmc,
 
     // timing
     cycle: u32,
@@ -65,14 +65,14 @@ impl APU {
         }
     }
 
-    pub fn step(&mut self) {
+    pub fn step(&mut self, dmc_data: u8) {
         self.cycle += 1;
         self.triangle.step();
-        if self.cycle % 2 == 0 {
+        if self.cycle % 2 == 1 {
             self.square1.step();
             self.square2.step();
             self.noise.step();
-            self.dmc.step();
+            self.dmc.step(dmc_data);
             self.step_frame_counter();
         }
 
