@@ -1,6 +1,7 @@
 mod utils;
 
 use rusty_nes_core::cpu::CPU;
+use rusty_nes_core::SAMPLE_RATE;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -26,5 +27,13 @@ impl NES {
 
     pub fn update_button(&mut self, index: u8, pressed: bool) {
         self.cpu.update_button(index, pressed);
+    }
+
+    pub fn load_audio_buffer(&mut self, buffer: &mut [f32]) {
+        self.cpu.load_samples(buffer);
+    }
+
+    pub fn sample_rate(&self) -> f32 {
+        SAMPLE_RATE
     }
 }

@@ -12,7 +12,8 @@ mod triangle;
 pub mod units;
 
 const CPU_FREQ: f32 = 1789773.0;
-pub const SAMPLE_RATE: f32 = 48000.0;
+// pub const SAMPLE_RATE: f32 = 48000.0;
+pub const SAMPLE_RATE: f32 = 44100.0;
 pub const BUFFER_SIZE: usize = 0x2000;
 
 pub struct APU {

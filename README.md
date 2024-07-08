@@ -114,7 +114,9 @@ For now saving state feature is only available on the `cli` version of the emula
 
 Mappers implemented:
 
-- NROM (0)
+- Mapper 0 (NROM)
+- Mapper 2 (UNROM)
+- Mapper4 (MMC3)
 
 ## Resources
 
@@ -128,23 +130,23 @@ Mappers implemented:
 
 ### Videos
 
-- [NES Emulator from Scratch] YouTube playlist by [OneLoneCoder]
 - [The NES Explained] YouTube playlist by [NesHacker]
+- [NES Emulator from Scratch] YouTube playlist by [OneLoneCoder]
 
 [NES Emulator from Scratch]: https://www.youtube.com/playlist?list=PLrOv9FMX8xJHqMvSGB_9G9nZZ_4IgteYf
-[The NES Explained]: https://www.youtube.com/playlist?list=PLrOv9FMX8xJHqMvSGB_9G9nZZ_4IgteYf
+[The NES Explained]: https://youtube.com/playlist?list=PLgvDB6LWam2VDGPgUAMTEEMk0PUtCJs-n&si=Qoquh5uNFiug1iWz
 [OneLoneCoder]: https://www.youtube.com/@javidx9
 [NesHacker]: https://www.youtube.com/@NesHacker
 
 ### Code
 
-- [github.com/OneLoneCoder/olcNES](https://github.com/OneLoneCoder/olcNES)
 - [github.com//zeta0134/rusticnes-sdl](https://github.com/zeta0134/rusticnes-sdl)
-- [github.com/takahirox/nes-rust](https://github.com/takahirox/nes-rust)
+- [github.com/OneLoneCoder/olcNES](https://github.com/OneLoneCoder/olcNES)
 - [github.com/marethyu/nesty](https://github.com/marethyu/nesty)
+- [github.com/takahirox/nes-rust](https://github.com/takahirox/nes-rust)
 - [github.com/nathsou/nessy](https://github.com/nathsou/nessy)
-- [github.com/scottferg/Fergulator](https://github.com/scottferg/Fergulator/)
 - [github.com/fogleman/nes](https://github.com/fogleman/nes)
 - [github.com/maxpoletaev/dendy](https://github.com/maxpoletaev/dendy/)
+- [github.com/scottferg/Fergulator](https://github.com/scottferg/Fergulator/)
 - [github.com/ltriant/nes](https://github.com/ltriant/nes)
 - [github.com/spieglt/nestur](https://github.com/spieglt/nestur)
