@@ -14,9 +14,22 @@ const keyMap: { [key: string]: number; } = {
 const SCREEN_WIDTH = 256;
 const SCREEN_HEIGHT = 240;
 let ctx: AudioContext;
+let paused = false;
 
 function scaleCanvas(canvas: HTMLCanvasElement) {
-    const scale = Math.min(window.innerWidth / SCREEN_WIDTH, window.innerHeight / SCREEN_HEIGHT);
+    const scale = Math.min(window.innerWidth / SCREEN_WIDTH, window.innerHeight / SCREEN_HEIGHT, 2);
+    canvas.style.width = `${SCREEN_WIDTH * scale}px`;
+    canvas.style.height = `${SCREEN_HEIGHT * scale}px`;
+}
+
+declare global {
+    interface Window {
+        scale: (scale: number) => void;
+    }
+}
+
+window.scale = (scale: number) => {
+    const canvas = document.querySelector<HTMLCanvasElement>('#screen')!;
     canvas.style.width = `${SCREEN_WIDTH * scale}px`;
     canvas.style.height = `${SCREEN_HEIGHT * scale}px`;
 }
@@ -25,6 +38,7 @@ function setupAudio(nes: NES): AudioContext {
     const context = new AudioContext({ sampleRate: nes.sample_rate() });
     const scriptNode = context.createScriptProcessor(1024 * 2, 0, 1);
     scriptNode.onaudioprocess = (e: AudioProcessingEvent) => {
+        if (paused) return;
         nes.load_audio_buffer(e.outputBuffer.getChannelData(0));
     };
     scriptNode.connect(context.destination);
@@ -54,7 +68,7 @@ async function fetchRom(romPath: string): Promise<Uint8Array> {
 
 async function startEmulator(canvas: HTMLCanvasElement) {
     const wasm = await init();
-    const romData = await fetchRom('roms/mario3.nes');
+    const romData = await fetchRom('roms/mario.nes');
     const nes = NES.new_nes(romData);
     const frame_buffer_length = SCREEN_WIDTH * SCREEN_HEIGHT * 4;
     const frame_buffer_pointer = nes.frame_buffer_pointer();
@@ -65,25 +79,37 @@ async function startEmulator(canvas: HTMLCanvasElement) {
     setupControls(nes);
     ctx = setupAudio(nes);
     const startLoop = () => {
+        requestAnimationFrame(startLoop);
+        if (paused) return;
         nes.step();
         imageData.data.set(new Uint8ClampedArray(wasm.memory.buffer, frame_buffer_pointer, frame_buffer_length));
         context.putImageData(imageData, 0, 0);
-        requestAnimationFrame(startLoop);
     }
     startLoop();
 }
 
 function start() {
+    paused = false;
     const canvas = document.querySelector<HTMLCanvasElement>('#screen')!;
     canvas.width = SCREEN_WIDTH;
     canvas.height = SCREEN_HEIGHT;
     scaleCanvas(canvas);
-    document.addEventListener('resize', () => scaleCanvas(canvas));
+    // document.addEventListener('resize', () => scaleCanvas(canvas));
 
     document.addEventListener("click", () => {
         if (ctx == undefined) {
             startEmulator(canvas)
         }
+    });
+
+    document.getElementById('pause')!.addEventListener('click', () => {
+        paused = !paused;
+        document.getElementById('pause')!.textContent = paused ? 'Resume' : 'Pause';
+    });
+
+    window.addEventListener('blur', function() {
+        paused = true;
+        document.getElementById('pause')!.textContent = 'Resume';
     });
 }
 

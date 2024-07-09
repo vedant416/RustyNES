@@ -5,27 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RustyNES</title>
     <style>
+      * {
+        box-sizing: border-box;
+      }
       body {
         margin: 0;
         padding: 0;
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
-        width: 100vw;
-        
+        /* width: 100vw; */
+
         height: 100vh;
-        background-color: black;
+        background-color: burlywood;
       }
       canvas {
-        width: 256px;
-        height: 240px;
+        /* width: 256px;
+        height: 240px; */
+
+        /* flex-grow: 1; */
         image-rendering: pixelated;
+        margin: 18px;
+        border: 4px solid black;
       }
     </style>
   </head>
 
   <body>
     <canvas id="screen"></canvas>
+    <button id="pause">pause</button>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
