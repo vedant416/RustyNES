@@ -36,4 +36,8 @@ impl NES {
     pub fn sample_rate(&self) -> f32 {
         SAMPLE_RATE
     }
+
+    pub fn change_rom(&mut self, bytes: Vec<u8>) {
+        self.cpu = CPU::new_from_bytes(bytes);
+    }
 }
