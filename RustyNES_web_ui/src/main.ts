@@ -13,6 +13,8 @@ const keyMap: { [key: string]: number; } = {
 
 const SCREEN_WIDTH = 256;
 const SCREEN_HEIGHT = 240;
+const frame_buffer_length = SCREEN_WIDTH * SCREEN_HEIGHT * 4;
+
 let ctx: AudioContext;
 let paused = false;
 
@@ -67,12 +69,12 @@ async function fetchRom(romPath: string): Promise<Uint8Array> {
 }
 
 async function startEmulator(canvas: HTMLCanvasElement) {
-    const wasm = await init();
+    // initialize wasm
     const romData = await fetchRom('roms/mario.nes');
+    const wasm = await init();
     const nes = NES.new_nes(romData);
-    const frame_buffer_length = SCREEN_WIDTH * SCREEN_HEIGHT * 4;
-    const frame_buffer_pointer = nes.frame_buffer_pointer();
 
+    // setup canvas
     const context = canvas.getContext('2d')!;
     const imageData = context.createImageData(SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -82,10 +84,19 @@ async function startEmulator(canvas: HTMLCanvasElement) {
         requestAnimationFrame(startLoop);
         if (paused) return;
         nes.step();
-        imageData.data.set(new Uint8ClampedArray(wasm.memory.buffer, frame_buffer_pointer, frame_buffer_length));
+        imageData.data.set(new Uint8ClampedArray(wasm.memory.buffer, nes.frame_buffer_pointer(), frame_buffer_length));
         context.putImageData(imageData, 0, 0);
     }
+
     startLoop();
+
+    document.getElementById('changerom')!.addEventListener('click', async () => {
+        console.log("change rom");
+        paused = true;
+        let x = await fetchRom("roms/mario3.nes");
+        nes.change_rom(x);
+        paused = false;
+    });
 }
 
 function start() {
@@ -96,6 +107,7 @@ function start() {
     scaleCanvas(canvas);
     // document.addEventListener('resize', () => scaleCanvas(canvas));
 
+    // start emulator on first click
     document.addEventListener("click", () => {
         if (ctx == undefined) {
             startEmulator(canvas)
@@ -107,9 +119,14 @@ function start() {
         document.getElementById('pause')!.textContent = paused ? 'Resume' : 'Pause';
     });
 
-    window.addEventListener('blur', function() {
+    window.addEventListener('blur', function () {
         paused = true;
         document.getElementById('pause')!.textContent = 'Resume';
+    });
+
+    window.addEventListener('focus', function () {
+        paused = false;
+        document.getElementById('pause')!.textContent = 'Pause';
     });
 }
 
