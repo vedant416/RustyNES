@@ -6,8 +6,6 @@ Experience classic NES games like Super Mario Bros on your computer (linux, wind
 
 Try it online in your browser: [RustyNES](https://vedant416.github.io/RustyNES/)
 
-## About project
-
 ## Screenshots
 
 ### Super Mario Bros.
