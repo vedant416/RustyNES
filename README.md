@@ -21,7 +21,6 @@ Try on your local machine by downloading the executable from the [releases](http
 `Website` is currently under development and more features will be added soon.
 In current version it loads Super Mario Bros by default. It has play and pause controls with no option to change the game.
 
-
 Try online in your browser: [RustyNES](https://vedant416.github.io/RustyNES/). (Work in progress)
 
 ## Screenshots
@@ -55,6 +54,17 @@ Try online in your browser: [RustyNES](https://vedant416.github.io/RustyNES/). (
 | Start           | <kbd>Enter</kbd>       |
 | Select          | <kbd>Right Shift</kbd> |
 
+In most games:
+
+- `Start` is used to start the game or
+  pause the game (when game is running).
+
+- `A` is used for jumping
+
+- `B` is used for shooting.
+
+- `Select` selects the next option in the menu
+
 ### Extra Features keybindings (Not in the original NES)
 
 For now saving state feature is only available on the `cli` version of the emulator.
@@ -65,6 +75,12 @@ For now saving state feature is only available on the `cli` version of the emula
 | Load emulator state | <kbd>M</kbd> |
 
 Emulator state is saved in a `.rustynes_sav` file.
+
+`.rustynes_sav` file can be loaded by passing the path to the file as an argument to the emulator.
+
+```bash
+./rusty_nes_cli <path_to_save_file>
+```
 
 ## Mappers
 
