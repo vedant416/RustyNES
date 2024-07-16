@@ -21,6 +21,18 @@ export class NES {
 * @param {boolean} pressed
 */
   update_button(index: number, pressed: boolean): void;
+/**
+* @param {Float32Array} buffer
+*/
+  load_audio_buffer(buffer: Float32Array): void;
+/**
+* @returns {number}
+*/
+  sample_rate(): number;
+/**
+* @param {Uint8Array} bytes
+*/
+  change_rom(bytes: Uint8Array): void;
 }
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
@@ -32,6 +44,9 @@ export interface InitOutput {
   readonly nes_step: (a: number) => void;
   readonly nes_frame_buffer_pointer: (a: number) => number;
   readonly nes_update_button: (a: number, b: number, c: number) => void;
+  readonly nes_load_audio_buffer: (a: number, b: number, c: number, d: number) => void;
+  readonly nes_sample_rate: (a: number) => number;
+  readonly nes_change_rom: (a: number, b: number, c: number) => void;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_free: (a: number, b: number, c: number) => void;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
