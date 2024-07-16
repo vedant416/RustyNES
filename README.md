@@ -19,6 +19,40 @@ Try it online in your browser: [RustyNES](https://vedant416.github.io/RustyNES/)
 - `RustyNES_cli`: A binary crate using `RustyNES_core` to render the emulator output.
 - `RustyNES_web_ui`: A web interface using `RustyNES_wasm` to enable running the emulator directly within a browser environment.
 
+## Keyboard controls
+
+### NES Controller keybindings
+
+| Emulator Button | Keyboard Key           |
+| --------------- | ---------------------- |
+| Up              | <kbd>W</kbd>           |
+| Left            | <kbd>A</kbd>           |
+| Down            | <kbd>S</kbd>           |
+| Right           | <kbd>D</kbd>           |
+| A               | <kbd>L</kbd>           |
+| B               | <kbd>K</kbd>           |
+| Start           | <kbd>Enter</kbd>       |
+| Select          | <kbd>Right Shift</kbd> |
+
+### Extra Features keybindings (Not in the original NES)
+
+For now saving state feature is only available on the `cli` version of the emulator.
+
+| Action              | Key          |
+| ------------------- | ------------ |
+| Save emulator state | <kbd>N</kbd> |
+| Load emulator state | <kbd>M</kbd> |
+
+Emulator state is saved in a `.rustynes_sav` file.
+
+## Mappers
+
+Mappers implemented:
+
+- Mapper 0 (NROM)
+- Mapper 2 (UNROM)
+- Mapper4 (MMC3)
+
 ## Building
 
 `RustyNES_core` library crate has zero dependencies, but `RustyNES_cli` uses [SDL2](https://www.libsdl.org/) for rendering and input handling.
@@ -36,6 +70,11 @@ Pass path to the ROM file as an argument to the executable.
 
 ```bash
 ./rusty_nes_cli <path_to_rom_file>
+```
+To load a save file (`.rustynes_sav`) pass the path to the save file as an argument.
+
+```bash
+./rusty_nes_cli <path_to_save_file>
 ```
 
 ### Cross-compiling to Windows
@@ -85,38 +124,6 @@ npm run dev
 ```
 
 This will build the RustyNES_wasm lib which will output the WebAssembly file and JavaScript bindings to the `RustyNES_web_ui/public/pkg` directory.
-
-## Keyboard controls
-
-### NES Controller keybindings
-
-| Key                    | NES Button |
-| ---------------------- | ---------- |
-| <kbd>W</kbd>           | Up         |
-| <kbd>A</kbd>           | Left       |
-| <kbd>S</kbd>           | Down       |
-| <kbd>D</kbd>           | Right      |
-| <kbd>L</kbd>           | A          |
-| <kbd>K</kbd>           | B          |
-| <kbd>Enter</kbd>       | Start      |
-| <kbd>Right Shift</kbd> | Select     |
-
-### Extra Features keybindings (Not in the original NES)
-
-For now saving state feature is only available on the `cli` version of the emulator.
-
-| Key          | Action              |
-| ------------ | ------------------- |
-| <kbd>N</kbd> | Save emulator state |
-| <kbd>M</kbd> | Load emulator state |
-
-## Mappers
-
-Mappers implemented:
-
-- Mapper 0 (NROM)
-- Mapper 2 (UNROM)
-- Mapper4 (MMC3)
 
 ## Resources
 
