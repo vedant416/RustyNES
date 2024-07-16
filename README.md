@@ -1,10 +1,16 @@
 # [RustyNES](https://vedant416.github.io/RustyNES/)
 
-RustyNES is a Nintendo Entertainment System (NES) emulator written in Rust.
+`RustyNES` is a Nintendo Entertainment System (NES) emulator written in Rust.
 
-Experience classic NES games like Super Mario Bros on your computer (linux, windows) or web browser.
+Written from scratch in `Rust` `without using any external libraries.`
 
-Try it online in your browser: [RustyNES](https://vedant416.github.io/RustyNES/)
+It is `cross-platform` and can run on Linux, Windows, and in a web browser (using `WebAssembly`).
+
+Runs using very low cpu and memory resources at `stable 60fps` and crisp audio output.
+
+Experience classic NES games like `Super Mario Bros`, `Super Mario Bros 2`, `Super Mario Bros 3`, `Contra`, and many more.
+
+Try it online in your browser: [RustyNES](https://vedant416.github.io/RustyNES/) (Work in progress)
 
 ## Screenshots
 
