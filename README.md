@@ -10,7 +10,14 @@ Runs using very low cpu and memory resources at `stable 60fps` and crisp audio o
 
 Experience classic NES games like `Super Mario Bros`, `Super Mario Bros 2`, `Super Mario Bros 3`, `Contra`, and many more.
 
-Try it online in your browser: [RustyNES](https://vedant416.github.io/RustyNES/) (Work in progress)
+`CLI` has all the features like save and load state so that we can resume the game from where we left.
+
+Try on your local machine by downloading the executable from the [releases](https://github.com/vedant416/RustyNES/releases/tag/v1.0)
+
+Website is currently under development and more features will be added soon.
+In current version it loads Super Mario Bros by default. It has play and pause controls with no option to change the game.
+
+Try online in your browser: [RustyNES](https://vedant416.github.io/RustyNES/). (Work in progress)
 
 ## Screenshots
 
@@ -157,13 +164,13 @@ This will build the RustyNES_wasm lib which will output the WebAssembly file and
 
 ### Code
 
-- [github.com//zeta0134/rusticnes-sdl](https://github.com/zeta0134/rusticnes-sdl)
-- [github.com/OneLoneCoder/olcNES](https://github.com/OneLoneCoder/olcNES)
-- [github.com/marethyu/nesty](https://github.com/marethyu/nesty)
-- [github.com/takahirox/nes-rust](https://github.com/takahirox/nes-rust)
-- [github.com/nathsou/nessy](https://github.com/nathsou/nessy)
-- [github.com/fogleman/nes](https://github.com/fogleman/nes)
-- [github.com/maxpoletaev/dendy](https://github.com/maxpoletaev/dendy/)
-- [github.com/scottferg/Fergulator](https://github.com/scottferg/Fergulator/)
-- [github.com/ltriant/nes](https://github.com/ltriant/nes)
-- [github.com/spieglt/nestur](https://github.com/spieglt/nestur)
+- [zeta0134/rusticnes-sdl](https://github.com/zeta0134/rusticnes-sdl)
+- [OneLoneCoder/olcNES](https://github.com/OneLoneCoder/olcNES)
+- [marethyu/nesty](https://github.com/marethyu/nesty)
+- [takahirox/nes-rust](https://github.com/takahirox/nes-rust)
+- [nathsou/nessy](https://github.com/nathsou/nessy)
+- [fogleman/nes](https://github.com/fogleman/nes)
+- [maxpoletaev/dendy](https://github.com/maxpoletaev/dendy/)
+- [scottferg/Fergulator](https://github.com/scottferg/Fergulator/)
+- [ltriant/nes](https://github.com/ltriant/nes)
+- [spieglt/nestur](https://github.com/spieglt/nestur)
