@@ -24,18 +24,6 @@ function scaleCanvas(canvas: HTMLCanvasElement) {
     canvas.style.height = `${SCREEN_HEIGHT * scale}px`;
 }
 
-declare global {
-    interface Window {
-        scale: (scale: number) => void;
-    }
-}
-
-window.scale = (scale: number) => {
-    const canvas = document.querySelector<HTMLCanvasElement>('#screen')!;
-    canvas.style.width = `${SCREEN_WIDTH * scale}px`;
-    canvas.style.height = `${SCREEN_HEIGHT * scale}px`;
-}
-
 function setupAudio(nes: NES): AudioContext {
     const context = new AudioContext({ sampleRate: nes.sample_rate() });
     const scriptNode = context.createScriptProcessor(1024 * 2, 0, 1);
@@ -89,14 +77,6 @@ async function startEmulator(canvas: HTMLCanvasElement) {
     }
 
     startLoop();
-
-    document.getElementById('changerom')!.addEventListener('click', async () => {
-        console.log("change rom");
-        paused = true;
-        let x = await fetchRom("roms/mario3.nes");
-        nes.change_rom(x);
-        paused = false;
-    });
 }
 
 function start() {
@@ -105,7 +85,7 @@ function start() {
     canvas.width = SCREEN_WIDTH;
     canvas.height = SCREEN_HEIGHT;
     scaleCanvas(canvas);
-    // document.addEventListener('resize', () => scaleCanvas(canvas));
+    document.addEventListener('resize', () => scaleCanvas(canvas));
 
     // start emulator on first click
     document.addEventListener("click", () => {

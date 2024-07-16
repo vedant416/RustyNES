@@ -6,10 +6,10 @@
   "scripts": {
     "build_wasm": "wasm-pack build --release ../RustyNES_wasm --target web --out-dir ../RustyNES_web_ui/public/pkg/",
     "clean": "rm -rf ./public/pkg/ && mkdir ./public/pkg/",
-    "dev": "npm run clean && npm run build_wasm && vite --host",
+    "dev": "npm run build_wasm && vite --host",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "build_deploy": "npm run clean && npm run build_wasm && tsc && vite build --base=/RustyNES",
+    "build_deploy": "npm run build_wasm && tsc && vite build --base=/RustyNES",
     "deploy": "npm run build_deploy && gh-pages -d dist"
   },
   "devDependencies": {
