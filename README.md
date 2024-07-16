@@ -10,12 +10,17 @@ Runs using very low cpu and memory resources at `stable 60fps` and crisp audio o
 
 Experience classic NES games like `Super Mario Bros`, `Super Mario Bros 2`, `Super Mario Bros 3`, `Contra`, and many more.
 
+##
+
 `CLI` has all the features like save and load state so that we can resume the game from where we left.
 
 Try on your local machine by downloading the executable from the [releases](https://github.com/vedant416/RustyNES/releases/tag/v1.0)
 
-Website is currently under development and more features will be added soon.
+##
+
+`Website` is currently under development and more features will be added soon.
 In current version it loads Super Mario Bros by default. It has play and pause controls with no option to change the game.
+
 
 Try online in your browser: [RustyNES](https://vedant416.github.io/RustyNES/). (Work in progress)
 
