@@ -27,10 +27,16 @@
       .button-container {
         display: flex;
         flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 8px;
-        gap: 8px;
+        padding: 5px;
+        margin: 5px;
+      }
+
+      .button-container button {
+        padding: 5px;
+        margin: 5px;
+        border: 1px solid black;
+        border-radius: 5px;
+        cursor: pointer;
       }
 
       table,
@@ -44,15 +50,54 @@
         border-collapse: collapse;
         caption-side: bottom;
       }
+
+      .flex-col {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .flex-row {
+        display: flex;
+        flex-direction: row;
+      }
+
+      ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        margin-right: 20px;
+      }
+
+      li {
+        cursor: pointer;
+        padding: 5px;
+        margin: 5px;
+        border: 1px solid black;
+        border-radius: 5px;
+        background-color: rgb(196, 178, 99);
+      }
     </style>
-    <script type="module" crossorigin src="/RustyNES/assets/index-CyK14Sko.js"></script>
+    <script type="module" crossorigin src="/RustyNES/assets/index-CiJfhvao.js"></script>
   </head>
 
   <body>
-    <canvas id="screen"></canvas>
-    <div class="button-container">
-      <button id="init">Click to start emulator</button>
-      <button id="pause">pause</button>
+    <canvas id="screen" width="256" height="240"></canvas>
+    <div class="controls">
+      <div class="flex-col">
+        <p>Controls</p>
+        <ul class="flex-row">
+          <li id="play">start emulator</li>
+          <li id="pause">stop emulator</li>
+          <li id="mute">toggle mute</li>
+        </ul>
+        <p>Click on game title to run</p>
+        <ul class="flex-col">
+          <li class="rom">mario</li>
+          <li class="rom">mario3</li>
+          <li class="rom">contra</li>
+          <li class="rom">alter_ego</li>
+        </ul>
+      </div>
     </div>
     <p>
       Website is currently under development.
