@@ -5,17 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RustyNES</title>
     <style>
+      @import url("https://fonts.googleapis.com/css2?family=VT323&display=swap");
+    </style>
+    <style>
       * {
         box-sizing: border-box;
+        font-family: "VT323";
       }
       body {
         margin: 0;
-        padding: 2px;
+        padding: 8px;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        background-color: burlywood;
+        background-color: #2b4d5c;
+        color: white;
       }
 
       canvas {
@@ -43,7 +48,7 @@
       table,
       th,
       td {
-        border: solid 1px #000;
+        border: solid 1px white;
         padding: 10px;
       }
 
@@ -55,11 +60,17 @@
       .flex-col {
         display: flex;
         flex-direction: column;
+        justify-content: center;
+        width: 100%;
+        margin-inline: auto;
       }
 
       .flex-row {
         display: flex;
+        justify-content: center;
+        align-items: center;
         flex-direction: row;
+        flex-wrap: wrap;
       }
 
       ul {
@@ -75,24 +86,59 @@
         margin: 5px;
         border: 1px solid black;
         border-radius: 5px;
-        background-color: rgb(196, 178, 99);
+        background-color: #4f6d7a;
       }
     </style>
-    <script type="module" crossorigin src="/RustyNES/assets/index-B-0HhYKd.js"></script>
+    <script type="module" crossorigin src="/RustyNES/assets/index-B2M7S8dT.js"></script>
+    <link rel="stylesheet" crossorigin href="/RustyNES/assets/index-BNUqAdc2.css">
   </head>
 
   <body>
     <canvas id="screen" width="256" height="240"></canvas>
+    <hr style="width: 100%; color: white; margin-block: 15px ;" />
+    <!--  -->
+    <div class="keyboard">
+      <div class="top-keys">
+        <div class="arrow-c">
+          <div class="arrow">
+            <div class="arrow-top">
+              <div class="key up" id="up">▲</div>
+            </div>
+            <div class="arrow-mid">
+              <div class="key left" id="left">◀</div>
+              <div class="key right" id="right">▶</div>
+            </div>
+            <div class="arrow-bottom">
+              <div class="key down" id="down">▼</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ab">
+          <div class="key b" id="b">B</div>
+          <div class="key a" id="a">A</div>
+        </div>
+      </div>
+      <div class="bottom-keys">
+        <div class="key select" id="select">SELECT</div>
+        <div class="key start" id="start">START</div>
+      </div>
+    </div>
+    <hr style="width: 100%; color: white; margin-block: 15px" />
     <div class="controls">
-      <div class="flex-col">
+      <div class="flex-col" style="font-size: 1.5rem">
         <p>Controls</p>
-        <ul class="flex-row">
-          <li id="play">start emulator</li>
-          <li id="pause">stop emulator</li>
-          <li id="mute">toggle mute</li>
+        <ul class="flex-row" style="font-size: 0.7em">
+          <li id="play">Start Emulator</li>
+          <li id="pause">Stop Emulator</li>
+          <li id="mute">Toggle Mute</li>
+          <li id="save">Save Game</li>
+          <li id="load">Load Game</li>
+          <li id="downloadBtn">Download Image</li>
         </ul>
-        <p>Click on game title to run</p>
-        <ul class="flex-col">
+        <hr style="width: 100%; color: white; margin-block: 15px ;" />
+        <p style="font-size: 1em">Click on game title to run</p>
+        <ul class="flex-col" style="font-size: 0.7em">
           <li class="rom">mario</li>
           <li class="rom">mario3</li>
           <li class="rom">contra</li>
@@ -100,12 +146,18 @@
         </ul>
       </div>
     </div>
-    <p>
+
+    <hr style="width: 100%; color: white; margin-block: 15px" />
+
+    <p style="font-size: 1.5rem">
       Website is currently under development.
       <br />
       Cli written in rust is fully developed.
     </p>
-    <table>
+
+    <hr style="width: 100%; color: white; margin-block: 20px" />
+
+    <table style="font-size: 1.5rem; margin-top: 15px;">
       <thead>
         <tr>
           <th>NES Button</th>

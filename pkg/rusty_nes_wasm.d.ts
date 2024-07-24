@@ -33,6 +33,19 @@ export class NES {
 * @param {Uint8Array} bytes
 */
   change_rom(bytes: Uint8Array): void;
+/**
+* @param {Uint8Array} bytes
+* @returns {NES}
+*/
+  static new_nes_from_save(bytes: Uint8Array): NES;
+/**
+* @returns {Uint8Array}
+*/
+  get_state(): Uint8Array;
+/**
+* @param {Uint8Array} bytes
+*/
+  set_state(bytes: Uint8Array): void;
 }
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
@@ -47,7 +60,11 @@ export interface InitOutput {
   readonly nes_load_audio_buffer: (a: number, b: number, c: number, d: number) => void;
   readonly nes_sample_rate: (a: number) => number;
   readonly nes_change_rom: (a: number, b: number, c: number) => void;
+  readonly nes_new_nes_from_save: (a: number, b: number) => number;
+  readonly nes_get_state: (a: number, b: number) => void;
+  readonly nes_set_state: (a: number, b: number, c: number) => void;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
+  readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_free: (a: number, b: number, c: number) => void;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
 }
