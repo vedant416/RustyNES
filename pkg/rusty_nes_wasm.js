@@ -179,6 +179,16 @@ export class NES {
         return NES.__wrap(ret);
     }
     /**
+    * @param {Uint8Array} bytes
+    * @returns {NES}
+    */
+    new_from_save_bytes(bytes) {
+        const ptr0 = passArray8ToWasm0(bytes, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.nes_new_from_save_bytes(this.__wbg_ptr, ptr0, len0);
+        return NES.__wrap(ret);
+    }
+    /**
     */
     step() {
         wasm.nes_step(this.__wbg_ptr);
@@ -219,16 +229,6 @@ export class NES {
         const ptr0 = passArray8ToWasm0(bytes, wasm.__wbindgen_malloc);
         const len0 = WASM_VECTOR_LEN;
         wasm.nes_change_rom(this.__wbg_ptr, ptr0, len0);
-    }
-    /**
-    * @param {Uint8Array} bytes
-    * @returns {NES}
-    */
-    static new_nes_from_save(bytes) {
-        const ptr0 = passArray8ToWasm0(bytes, wasm.__wbindgen_malloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.nes_new_nes_from_save(ptr0, len0);
-        return NES.__wrap(ret);
     }
     /**
     * @returns {Uint8Array}

@@ -10,6 +10,11 @@ export class NES {
 */
   static new_nes(bytes: Uint8Array): NES;
 /**
+* @param {Uint8Array} bytes
+* @returns {NES}
+*/
+  new_from_save_bytes(bytes: Uint8Array): NES;
+/**
 */
   step(): void;
 /**
@@ -34,11 +39,6 @@ export class NES {
 */
   change_rom(bytes: Uint8Array): void;
 /**
-* @param {Uint8Array} bytes
-* @returns {NES}
-*/
-  static new_nes_from_save(bytes: Uint8Array): NES;
-/**
 * @returns {Uint8Array}
 */
   get_state(): Uint8Array;
@@ -54,13 +54,13 @@ export interface InitOutput {
   readonly memory: WebAssembly.Memory;
   readonly __wbg_nes_free: (a: number) => void;
   readonly nes_new_nes: (a: number, b: number) => number;
+  readonly nes_new_from_save_bytes: (a: number, b: number, c: number) => number;
   readonly nes_step: (a: number) => void;
   readonly nes_frame_buffer_pointer: (a: number) => number;
   readonly nes_update_button: (a: number, b: number, c: number) => void;
   readonly nes_load_audio_buffer: (a: number, b: number, c: number, d: number) => void;
   readonly nes_sample_rate: (a: number) => number;
   readonly nes_change_rom: (a: number, b: number, c: number) => void;
-  readonly nes_new_nes_from_save: (a: number, b: number) => number;
   readonly nes_get_state: (a: number, b: number) => void;
   readonly nes_set_state: (a: number, b: number, c: number) => void;
   readonly __wbindgen_malloc: (a: number, b: number) => number;

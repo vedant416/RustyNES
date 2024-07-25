@@ -23,12 +23,7 @@
         color: white;
       }
 
-      canvas {
-        display: block;
-        image-rendering: pixelated;
-        margin: 18px;
-        border: 4px solid black;
-      }
+
 
       .button-container {
         display: flex;
@@ -89,13 +84,15 @@
         background-color: #4f6d7a;
       }
     </style>
-    <script type="module" crossorigin src="/RustyNES/assets/index-DoX1LYZO.js"></script>
-    <link rel="stylesheet" crossorigin href="/RustyNES/assets/index-BgjHzRfZ.css">
+    <script type="module" crossorigin src="/RustyNES/assets/index-wY6rjYPn.js"></script>
+    <link rel="stylesheet" crossorigin href="/RustyNES/assets/index-V7-lDBH8.css">
   </head>
 
   <body>
-    <canvas id="screen" width="256" height="240"></canvas>
-    <hr style="width: 100%; color: white; margin-block: 15px ;" />
+    <div id="canvas-container">
+      <canvas id="screen" width="256" height="240"></canvas>
+    </div>
+    <hr style="width: 100%; color: white; margin-block: 15px" />
     <!--  -->
     <div class="keyboard">
       <div class="top-keys">
@@ -136,12 +133,11 @@
           <li id="load">Load Game</li>
           <li id="downloadBtn">Download Image</li>
         </ul>
-        <hr style="width: 100%; color: white; margin-block: 15px ;" />
+        <hr style="width: 100%; color: white; margin-block: 15px" />
         <p style="font-size: 1em">Click on game title to run</p>
         <ul class="flex-col" style="font-size: 0.7em">
           <li class="rom" data-name="mario">Super Mario Bros</li>
-          <li class="rom" data-name="mario3">Super Mario Bros 3
-          </li>
+          <li class="rom" data-name="mario3">Super Mario Bros 3</li>
           <li class="rom" data-name="contra">Contra</li>
           <li class="rom" data-name="alter_ego">Alter Ego</li>
         </ul>
@@ -158,7 +154,7 @@
 
     <hr style="width: 100%; color: white; margin-block: 20px" />
 
-    <table style="font-size: 1.5rem; margin-top: 15px;">
+    <table style="font-size: 1.5rem; margin-top: 15px">
       <thead>
         <tr>
           <th>NES Button</th>
