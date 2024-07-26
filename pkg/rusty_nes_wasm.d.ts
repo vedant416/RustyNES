@@ -46,6 +46,9 @@ export class NES {
 * @param {Uint8Array} bytes
 */
   set_state(bytes: Uint8Array): void;
+/**
+*/
+  throw_rust_error(): void;
 }
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
@@ -63,10 +66,10 @@ export interface InitOutput {
   readonly nes_change_rom: (a: number, b: number, c: number) => void;
   readonly nes_get_state: (a: number, b: number) => void;
   readonly nes_set_state: (a: number, b: number, c: number) => void;
+  readonly nes_throw_rust_error: (a: number) => void;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_free: (a: number, b: number, c: number) => void;
-  readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
 }
 
 export type SyncInitInput = BufferSource | WebAssembly.Module;
