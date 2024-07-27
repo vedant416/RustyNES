@@ -18,8 +18,7 @@ Try on your local machine by downloading the executable from the [releases](http
 
 ##
 
-`Website` is currently under development and more features will be added soon.
-In current version it loads Super Mario Bros by default. It has play and pause controls with no option to change the game.
+`Website` is currently under development.
 
 Try online in your browser: [RustyNES](https://vedant416.github.io/RustyNES/). (Work in progress)
 
@@ -67,7 +66,6 @@ In most games:
 
 ### Extra Features keybindings (Not in the original NES)
 
-For now saving state feature is only available on the `cli` version of the emulator.
 
 | Action              | Key          |
 | ------------------- | ------------ |
