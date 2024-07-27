@@ -53,6 +53,13 @@ impl Triangle {
     }
 
     pub fn output(&self) -> f32 {
+        // if !self.enabled
+        //     || self.length_counter.counter == 0
+        //     || self.counter == 0
+        //     || self.timer.period < 2
+        // {
+        //     return 7.5;
+        // }
         TRIANGLE[self.duty_cycle as usize] as f32
     }
 }
@@ -84,6 +91,9 @@ impl Triangle {
         let period = (val & 0b111) as u16;
         let period = period << 8;
         self.timer.period = (self.timer.period & 0x00FF) | period;
-        self.length_counter.set(val >> 3);
+        if self.enabled {
+            self.length_counter.set(val >> 3);
+        }
+        self.reload_flag = true;
     }
 }

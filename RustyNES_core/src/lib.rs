@@ -17,12 +17,20 @@ use ppu::PPU;
 use rom::ROM;
 
 impl CPU {
-    pub fn new_from_bytes(bytes: Vec<u8>) -> CPU {
+    pub fn new_from_rom_bytes(bytes: Vec<u8>) -> CPU {
         let cartridge = ROM::new_cartridge(bytes);
         let ppu = PPU::new_ppu(cartridge);
         let controller = Controller::new_controller();
         let bus = BUS::new_bus(ppu, controller);
         CPU::new_cpu(bus)
+    }
+
+    pub fn new_nes_from_save_bytes(bytes: Vec<u8>) -> CPU {
+        let mut cpu = CPU::default();
+        let buffer = &mut buffer::Buffer::new_buffer();
+        buffer.data = bytes;
+        cpu.decode(buffer);
+        cpu
     }
 
     pub fn update_button(&mut self, index: u8, pressed: bool) {

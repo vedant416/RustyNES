@@ -45,7 +45,7 @@ impl Noise {
     }
 
     pub fn output(&self) -> f32 {
-        if self.shift_register & 1 == 1 || self.length_counter.counter == 0 {
+        if !self.enabled || self.shift_register & 1 != 0 || self.length_counter.counter == 0 {
             0.0
         } else {
             self.envelope.output() as f32
@@ -83,7 +83,9 @@ impl Noise {
     }
 
     pub fn write2(&mut self, val: u8) {
+        if self.enabled {
+            self.length_counter.set(val >> 3);
+        }
         self.envelope.start = true;
-        self.length_counter.set(val >> 3);
     }
 }

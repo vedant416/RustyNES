@@ -47,7 +47,7 @@ fn main() {
         cpu.decode(buffer);
     } else if path.ends_with(".nes") {
         let bytes = read(path).expect("Failed to read ROM file");
-        cpu = CPU::new_from_bytes(bytes);
+        cpu = CPU::new_from_rom_bytes(bytes);
     } else {
         panic!("Invalid file type. Please provide a .nes ROM file or .rustynes_sav");
     }

@@ -11,6 +11,13 @@ impl Buffer {
         }
     }
 
+    pub fn new_from_bytes(bytes: Vec<u8>) -> Self {
+        Self {
+            data: bytes,
+            index: 0,
+        }
+    }
+
     // write functions //////////////////////////////////////////
     pub fn write_bool(&mut self, val: bool) {
         self.data.push(val as u8);

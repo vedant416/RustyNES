@@ -67,7 +67,7 @@ impl Dmc {
             }
             // if loop is off and end of sample is reached: fire irq
             else if self.irq_enabled {
-                self.irq_triggered = true;
+                // self.irq_triggered = true;
             }
         }
     }

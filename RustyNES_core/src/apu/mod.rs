@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-#![allow(unused_variables)]
 use dmc::Dmc;
 use noise::Noise;
 use square::Square;
@@ -10,7 +8,6 @@ mod noise;
 mod square;
 mod triangle;
 pub mod units;
-
 const CPU_FREQ: f32 = 1789773.0;
 // pub const SAMPLE_RATE: f32 = 48000.0;
 pub const SAMPLE_RATE: f32 = 44100.0;
@@ -245,7 +242,7 @@ impl APU {
 
 // Sound output /////
 impl APU {
-    fn output(&self) -> f32 {
+    fn output(&mut self) -> f32 {
         let s1 = self.square1.output();
         let s2 = self.square2.output();
         let t = self.triangle.output();
@@ -254,7 +251,7 @@ impl APU {
         let out1 = 0.00752 * (s1 + s2);
         let out2 = (0.00851 * t) + (0.00494 * n) + (0.00335 * d);
         let output = out1 + out2;
-        output * 0.2
+        output * 0.5
     }
 
     fn read_buffer(&mut self) -> f32 {

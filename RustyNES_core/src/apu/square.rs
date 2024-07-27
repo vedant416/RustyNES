@@ -120,10 +120,10 @@ impl Square {
 
     pub fn write1(&mut self, val: u8) {
         self.sweep_reload = true;
-        self.sweep_enabled = val & 0x80 != 0;
         self.sweep_period = ((val >> 4) & 0b111) + 1;
         self.sweep_negate = val & 0x8 != 0;
         self.sweep_shift = val & 0b111;
+        self.sweep_enabled = val & 0x80 != 0 && self.sweep_shift != 0;
     }
 
     pub fn write2(&mut self, val: u8) {
@@ -132,9 +132,12 @@ impl Square {
 
     pub fn write3(&mut self, val: u8) {
         self.duty_cycle = 0;
+        self.envelope.start = true;
         let period = (val & 0b111) as u16;
         let period = period << 8;
         self.timer.period = (self.timer.period & 0x00FF) | period;
-        self.length_counter.set(val >> 3);
+        if self.enabled {
+            self.length_counter.set(val >> 3);
+        }
     }
 }
