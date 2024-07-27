@@ -1,5 +1,6 @@
 {
   "name": "rusty_nes_wasm",
+  "type": "module",
   "collaborators": [
     "__Vedant__ <vedantpahune@gmail.com>"
   ],
@@ -9,7 +10,7 @@
     "rusty_nes_wasm.js",
     "rusty_nes_wasm.d.ts"
   ],
-  "module": "rusty_nes_wasm.js",
+  "main": "rusty_nes_wasm.js",
   "types": "rusty_nes_wasm.d.ts",
   "sideEffects": [
     "./snippets/*"
