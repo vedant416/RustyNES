@@ -4,61 +4,80 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RustyNES</title>
-    <style>
-      * {
-        box-sizing: border-box;
-      }
-      body {
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        background-color: burlywood;
-      }
-
-      canvas {
-        image-rendering: pixelated;
-        margin: 18px;
-        border: 4px solid black;
-      }
-
-      .button-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 8px;
-        gap: 8px;
-      }
-
-      table,
-      th,
-      td {
-        border: solid 1px #000;
-        padding: 10px;
-      }
-
-      table {
-        border-collapse: collapse;
-        caption-side: bottom;
-      }
-    </style>
+    <link rel="stylesheet" href="./index.css" />
   </head>
 
   <body>
-    <canvas id="screen"></canvas>
-    <div class="button-container">
-      <button id="init">Click to start emulator</button>
-      <button id="pause">pause</button>
+    <div class="stats"></div>
+    <div id="canvas-container">
+      <canvas id="screen" width="256" height="240"></canvas>
     </div>
-    <p>
+    <hr style="width: 100%; color: white; margin-block: 15px" />
+    <!--  -->
+    <div class="keyboard">
+      <div class="top-keys">
+        <div class="arrow-c">
+          <div class="arrow">
+            <div class="arrow-top">
+              <div class="key up" id="up">▲</div>
+            </div>
+            <div class="arrow-mid">
+              <div class="key left" id="left">◀</div>
+              <div class="key right" id="right">▶</div>
+            </div>
+            <div class="arrow-bottom">
+              <div class="key down" id="down">▼</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ab">
+          <div class="key b" id="b">B</div>
+          <div class="key a" id="a">A</div>
+        </div>
+      </div>
+      <div class="bottom-keys">
+        <div class="key select" id="select">SELECT</div>
+        <div class="key start" id="start">START</div>
+      </div>
+    </div>
+    <hr style="width: 100%; color: white; margin-block: 15px" />
+    <div class="controls">
+      <div class="flex-col" style="font-size: 1.5rem">
+        <p>Controls</p>
+        <ul class="flex-row" style="font-size: 0.7em">
+          <li id="play">Start Emulator</li>
+          <li id="pause">Stop Emulator</li>
+          <li id="mute">Toggle Mute</li>
+          <li id="save">Save Game</li>
+          <li id="load">Load Game</li>
+          <li id="downloadBtn">Download Image</li>
+        </ul>
+        <hr style="width: 100%; color: white; margin-block: 15px" />
+        <p style="font-size: 1em">Click on game title to run</p>
+        <ul class="flex-col" style="font-size: 0.7em">
+          <li class="rom" data-name="mario">Super Mario Bros</li>
+          <li class="rom" data-name="mario3">Super Mario Bros 3</li>
+          <li class="rom" data-name="contra">Contra</li>
+          <li class="rom" data-name="alter_ego">Alter Ego</li>
+        </ul>
+      </div>
+    </div>
+
+    <hr style="width: 100%; color: white; margin-block: 15px" />
+
+    <p style="font-size: 1.5rem">
       Website is currently under development.
-      <br />
-      Cli written in rust is fully developed.
+      For best experience set refresh rate to 60Hz.
+      Otherwise sound will not be clear.
     </p>
-    <table>
+    <a style="color:white; font-size: 1.5rem ; border-bottom: 3px dotted white; text-decoration: none;" href="https://github.com/vedant416/RustyNES">
+      Source Code
+    </a>
+
+    <hr style="width: 100%; color: white; margin-block: 20px" />
+
+    <table style="font-size: 1.5rem; margin-top: 15px">
       <thead>
         <tr>
           <th>NES Button</th>

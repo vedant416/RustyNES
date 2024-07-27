@@ -16,5 +16,10 @@
     "gh-pages": "^6.1.1",
     "typescript": "^5.2.2",
     "vite": "^5.1.4"
+  },
+  "dependencies": {
+    "@types/stats": "^0.16.30",
+    "idb": "^8.0.0",
+    "stats.js": "^0.17.0"
   }
 }
