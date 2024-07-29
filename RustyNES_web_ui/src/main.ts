@@ -29,6 +29,7 @@ let audioContext: AudioContext | null = null;
 let scriptNode: ScriptProcessorNode | null = null;
 let isAudioPlaying: boolean = false;
 let isVideoPlaying: boolean = false;
+let isMuted = true; // default mute
 
 let onFrame!: () => void
 let onSample!: (e: AudioProcessingEvent) => void
@@ -44,48 +45,8 @@ let statsAdded = false;
 let stats1: Stats;
 let stats2: Stats;
 
-const startVideo = () => {
-    console.log("startVideo");
-    if (!statsAdded) {
-        statsAdded = true;
-
-        ////// DEBUG INFO
-        let statsDiv = document.querySelector('.stats') as HTMLDivElement;
-        stats1 = new Stats();
-        stats1.showPanel(0); // FPS
-        stats1.dom.style.cssText = '';
-        statsDiv.appendChild(stats1.dom);
-
-        stats2 = new Stats();
-        stats2.showPanel(1); // MS
-        stats2.dom.style.cssText = '';
-        statsDiv.appendChild(stats2.dom);
-        //////
-    }
-    if (!isVideoPlaying) {
-        isVideoPlaying = true;
-        initVideo();
-    }
-}
-
-const stopVideo = () => {
-    if (isVideoPlaying) {
-        isVideoPlaying = false;
-        if (videoContext) {
-            cancelAnimationFrame(videoContext);
-            videoContext = null;
-        }
-    }
-}
-
-(window as any).onError = (error: string) => {
-    stopBoth();
-    isInit = false;
-    alert(error);
-    console.error(error)
-};
-
-const initVideo = () => {
+///// VIDEO
+const setupVideo = () => {
     ////// for throttling loop to 60 fps
     let fps = 60;
     let requiredDelta = Math.floor(1000 / fps);
@@ -106,8 +67,6 @@ const initVideo = () => {
         videoContext = requestAnimationFrame(loop);
         delta = now - prev;
         if (delta < requiredDelta) {
-            console.log("Rendering too fast");
-
             return;
         }
         prev = now - (delta % requiredDelta);
@@ -121,7 +80,7 @@ const initVideo = () => {
         _prev = now;
         if (totalFrames % 60 === 0) {
             let fps = 1000 / (totalTime / 60);
-            console.log(fps.toFixed(2));
+            // console.log(fps.toFixed(2));
             totalFrames = 0;
             totalTime = 0;
         }
@@ -135,13 +94,45 @@ const initVideo = () => {
     loop(prev)
 }
 
-////////////////
+const startVideo = () => {
+    if (!statsAdded) {
+        statsAdded = true;
+
+        ////// DEBUG INFO
+        let statsDiv = document.querySelector('.stats') as HTMLDivElement;
+        stats1 = new Stats();
+        stats1.showPanel(0); // FPS
+        stats1.dom.style.cssText = '';
+        statsDiv.appendChild(stats1.dom);
+
+        stats2 = new Stats();
+        stats2.showPanel(1); // MS
+        stats2.dom.style.cssText = '';
+        statsDiv.appendChild(stats2.dom);
+        //////
+    }
+    if (!isVideoPlaying) {
+        isVideoPlaying = true;
+        console.log("video started");
+        setupVideo();
+    }
+}
+
+const stopVideo = () => {
+    if (isVideoPlaying) {
+        isVideoPlaying = false;
+        console.log("video stopped");
+
+        if (videoContext) {
+            cancelAnimationFrame(videoContext);
+            videoContext = null;
+        }
+    }
+}
+
+////// AUDIO
 const setupAudio = () => {
     audioContext = new AudioContext({ sampleRate: 44100 });
-    audioContext.onstatechange = () => {
-        console.log(audioContext?.state);
-
-    };
     scriptNode = audioContext.createScriptProcessor(1024, 0, 1);
     scriptNode.onaudioprocess = (e: AudioProcessingEvent) => {
         onSample(e);
@@ -155,20 +146,19 @@ const startAudio = async () => {
         setupAudio();
     }
 
-    if (isAudioPlaying) {
-        return;
+    if (!isAudioPlaying) {
+        await audioContext?.resume();
+        isAudioPlaying = true;
+        console.log("audio started");
     }
 
-    await audioContext?.resume();
-    isAudioPlaying = true;
-    console.log("audio playing");
 }
 
 const stopAudio = async () => {
     if (audioContext && isAudioPlaying) {
         await audioContext.suspend();
         isAudioPlaying = false
-        console.log("audio paused");
+        console.log("audio stopped");
     }
 }
 
@@ -183,126 +173,138 @@ const cleanupAudio = async () => {
     }
 }
 
-//////////////////
-const startBoth = async () => {
-    startVideo();
-    if (isMuted) {
+let toggleMute = async () => {
+    isMuted = !isMuted;
+    console.log("muted = ", isMuted);
+
+    if (!isVideoPlaying) {
         return;
     }
-    await startAudio();
+    if (isMuted) {
+        await stopAudio();
+    }
+    else {
+        await startAudio();
+    }
 }
 
-const stopBoth = async () => {
+///// BOTH
+const start = async () => {
+    startVideo();
+    if (!isMuted) {
+        await startAudio();
+    }
+}
+
+const stop = async () => {
     await stopAudio();
     stopVideo();
 }
 
-const cleanupBoth = async () => {
-    stopBoth();
+const destroy = async () => {
+    stop();
     await cleanupAudio();
+    nes.free();
 }
 
+////// ERROR HANDLING
+(window as any).onError = (error: string) => {
+    stop();
+    isInit = false;
+    alert(error);
+    console.error(error)
+};
+
+///// EVENT HANDLERS
 let playButton = document.getElementById('play')!;
 let pauseButton = document.getElementById('pause')!;
-
-let isMuted = false;
 let mute = document.getElementById('mute')!;
+let li = document.getElementsByClassName('rom') as HTMLCollectionOf<HTMLLIElement>;
+let liList = Array.from(li);
+
+let aBtn = document.getElementById('a')!;
+let bBtn = document.getElementById('b')!;
+let selectBtn = document.getElementById('select')!;
+let startBtn = document.getElementById('start')!;
+let upBtn = document.getElementById('up')!;
+let downBtn = document.getElementById('down')!;
+let leftBtn = document.getElementById('left')!;
+let rightBtn = document.getElementById('right')!;
+let btnList = [aBtn, bBtn, selectBtn, startBtn, upBtn, downBtn, leftBtn, rightBtn];
+
 const setupEventListeners = () => {
     window.addEventListener('keydown', onPress);
     window.addEventListener('keyup', onLift);
-    playButton.addEventListener('click', startBoth);
-    pauseButton.addEventListener('click', stopBoth);
-    mute.addEventListener('click', async () => {
-        if (!isVideoPlaying) {
-            return;
-        }
-
-        if (!audioContext) {
-            await startAudio();
-        }
-
-        else if (isAudioPlaying) {
-
-            await stopAudio();
-        }
-        else {
-            await startAudio();
-        }
-        isMuted = !isMuted;
-    });
-    let liList = document.getElementsByClassName('rom') as HTMLCollectionOf<HTMLLIElement>;
-    [...liList].forEach((li) => {
-        li.addEventListener('click', async (e) => {
+    playButton.onclick = start;
+    pauseButton.onclick = stop;
+    mute.onclick = toggleMute;
+    liList.forEach((li) => {
+        li.onclick = async (e) => {
             let url = li.getAttribute('data-name')!;
             changeRom(`roms/${url}.nes`);
-        });
+        };
     });
 
-    let up = document.getElementById('up')!;
-    let down = document.getElementById('down')!;
-    let left = document.getElementById('left')!;
-    let right = document.getElementById('right')!;
-    let a = document.getElementById('a')!;
-    let b = document.getElementById('b')!;
-    let select = document.getElementById('select')!;
-    let start = document.getElementById('start')!;
-
     const addTouchListeners = (element: HTMLElement, key: number) => {
-        element.addEventListener('touchstart', () => {
+        element.ontouchstart = () => {
             element.classList.toggle("pressed");
             navigator.vibrate(70);
             nes.update_button(key, true)
-        });
-        element.addEventListener('touchend', () => {
+        };
+
+        element.ontouchend = () => {
             element.classList.toggle("pressed");
             nes.update_button(key, false)
-        });
+        }
     };
 
-    addTouchListeners(a, 0);
-    addTouchListeners(b, 1);
-    addTouchListeners(select, 2);
-    addTouchListeners(start, 3);
-    addTouchListeners(up, 4);
-    addTouchListeners(down, 5);
-    addTouchListeners(left, 6);
-    addTouchListeners(right, 7);
+
+    btnList.forEach((btn, index) => {
+        addTouchListeners(btn, index);
+    });
 }
 
 const cleanupEventListeners = () => {
     window.removeEventListener('keydown', onPress);
     window.removeEventListener('keyup', onLift);
-    playButton.removeEventListener('click', startBoth);
-    pauseButton.removeEventListener('click', stopBoth);
+    window.onresize = null;
+    playButton.onclick = null;
+    pauseButton.onclick = null;
+    mute.onclick = null;
+    liList.forEach((li) => {
+        li.onclick = null;
+    });
+    btnList.forEach((btn) => {
+        btn.ontouchstart = null;
+        btn.ontouchend = null;
+    });
 }
 
 const changeRom = async (url: string) => {
-    await stopBoth();
+    await stop();
     const romData = await fetchRom(url);
     onRomChange(romData);
-    await startBoth();
+    await start();
 }
 
 const init = async (url: string) => {
     isInit = true;
     // setup canvas
-    console.log("init called with url ", url);
-
     const canvas = document.querySelector<HTMLCanvasElement>('#screen')!;
     const context = canvas.getContext('2d')!;
     const imageData = context.createImageData(SCREEN_WIDTH, SCREEN_HEIGHT);
     let parent = document.getElementById('canvas-container')! as HTMLElement;
-    console.log(parent);
 
     const scale = Math.min(window.innerWidth / SCREEN_WIDTH, window.innerHeight / SCREEN_HEIGHT, 3);
     let w = (SCREEN_WIDTH - 10) * scale;
     parent.style.width = w + "px";
 
-    window.addEventListener('resize', () => {
+    window.onresize = () => {
         const scale = Math.min(window.innerWidth / SCREEN_WIDTH, window.innerHeight / SCREEN_HEIGHT, 3);
         let w = (SCREEN_WIDTH - 10) * scale;
         parent.style.width = w + "px";
-    });
+    }
+
 
     // init wasm
     const romData = await fetchRom(url);
@@ -354,7 +356,6 @@ function scale(element: HTMLElement) {
 }
 
 const main = async () => {
-    console.log("inside main");
     let saveButton = document.getElementById('save')!;
     let loadButton = document.getElementById('load')!;
     saveButton.onclick = save;
@@ -362,7 +363,6 @@ const main = async () => {
     ///
     const canvas = document.getElementById('screen')! as HTMLCanvasElement;
     document.getElementById('downloadBtn')!.addEventListener('click', () => {
-        console.log('Download button clicked');
         const scaleFactor = 2;
         const offScreenCanvas = document.createElement('canvas')!;
         const offScreenContext = offScreenCanvas.getContext('2d')!;
@@ -392,7 +392,6 @@ let save_buffer: Uint8Array;
 
 const save = () => {
     save_buffer = nes.get_state();
-    console.log(save_buffer);
 }
 
 const load = () => {
