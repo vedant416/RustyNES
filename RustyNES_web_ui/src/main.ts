@@ -15,15 +15,6 @@ const SCREEN_WIDTH = 256;
 const SCREEN_HEIGHT = 240;
 const frame_buffer_length = SCREEN_WIDTH * SCREEN_HEIGHT * 4;
 
-async function fetchRom(romPath: string): Promise<Uint8Array> {
-    const response = await fetch(romPath);
-    if (!response.ok) {
-        throw new Error(`Failed to fetch ROM: ${response.statusText}`);
-    }
-    const buffer = await response.arrayBuffer();
-    return new Uint8Array(buffer);
-}
-
 let videoContext: number | null = null;
 let audioContext: AudioContext | null = null;
 let scriptNode: ScriptProcessorNode | null = null;
@@ -173,7 +164,7 @@ const cleanupAudio = async () => {
     }
 }
 
-let toggleMute = async () => {
+const toggleMute = async () => {
     isMuted = !isMuted;
     console.log("muted = ", isMuted);
 
@@ -188,7 +179,7 @@ let toggleMute = async () => {
     }
 }
 
-///// BOTH
+///// START/STOP/DESTROY
 const start = async () => {
     startVideo();
     if (!isMuted) {
@@ -215,14 +206,78 @@ const destroy = async () => {
     console.error(error)
 };
 
-///// EVENT HANDLERS
+///// SAVE/LOAD/CHANGE ROM
+let saveBuffer: Uint8Array;
 
+const saveState = () => {
+    saveBuffer = nes.get_state();
+}
+
+const loadState = () => {
+    try {
+        nes.set_state(saveBuffer);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const fetchRom = async (romPath: string) => {
+    const response = await fetch(romPath);
+    if (!response.ok) {
+        throw new Error(`Failed to fetch ROM: ${response.statusText}`);
+    }
+    const buffer = await response.arrayBuffer();
+    return new Uint8Array(buffer);
+}
+
+const changeRom = async (url: string) => {
+    await stop();
+    const romData = await fetchRom(url);
+    onRomChange(romData);
+    await start();
+}
+
+const downloadImg = () => {
+    const canvas = document.getElementById('screen')! as HTMLCanvasElement;
+    const scaleFactor = 2;
+    const offScreenCanvas = document.createElement('canvas')!;
+    const offScreenContext = offScreenCanvas.getContext('2d')!;
+    offScreenCanvas.width = canvas.width * scaleFactor;
+    offScreenCanvas.height = canvas.height * scaleFactor;
+    offScreenCanvas.style.imageRendering = "pixelated";
+    offScreenContext.imageSmoothingEnabled = false;
+    offScreenContext.drawImage(
+        canvas,
+        0, 0,
+        canvas.width, canvas.height,
+        0, 0,
+        offScreenCanvas.width, offScreenCanvas.height
+    );
+
+    const dataURL = offScreenCanvas.toDataURL('image/png');
+    const link = document.createElement('a');
+    link.href = dataURL;
+    link.download = 'canvas-image.png';
+    link.click();
+};
+
+
+///// EVENT HANDLING
 const setupEventListeners = () => {
     let playButton = document.getElementById('play')!;
     let pauseButton = document.getElementById('pause')!;
     let mute = document.getElementById('mute')!;
-    let li = document.getElementsByClassName('rom') as HTMLCollectionOf<HTMLLIElement>;
-    let liList = Array.from(li);
+    let saveButton = document.getElementById('save')!;
+    let loadButton = document.getElementById('load')!;
+    let downloadBtn = document.getElementById('downloadBtn')!
+
+
+    playButton.onclick = start;
+    pauseButton.onclick = stop;
+    mute.onclick = toggleMute;
+    saveButton.onclick = saveState;
+    loadButton.onclick = loadState;
+    downloadBtn.onclick = downloadImg;
 
     let aBtn = document.getElementById('a')!;
     let bBtn = document.getElementById('b')!;
@@ -234,9 +289,9 @@ const setupEventListeners = () => {
     let rightBtn = document.getElementById('right')!;
     let btnList = [aBtn, bBtn, selectBtn, startBtn, upBtn, downBtn, leftBtn, rightBtn];
 
-    playButton.onclick = start;
-    pauseButton.onclick = stop;
-    mute.onclick = toggleMute;
+    let li = document.getElementsByClassName('rom') as HTMLCollectionOf<HTMLLIElement>;
+    let liList = Array.from(li);
+
     liList.forEach((li) => {
         li.onclick = async (e) => {
             let url = li.getAttribute('data-name')!;
@@ -277,6 +332,8 @@ const setupEventListeners = () => {
         playButton.onclick = null;
         pauseButton.onclick = null;
         mute.onclick = null;
+        saveButton.onclick = null;
+        loadButton.onclick = null;
 
         liList.forEach((li) => {
             li.onclick = null;
@@ -291,15 +348,8 @@ const setupEventListeners = () => {
     return cleanupEventListeners;
 }
 
-
-const changeRom = async (url: string) => {
-    await stop();
-    const romData = await fetchRom(url);
-    onRomChange(romData);
-    await start();
-}
-
-const init = async (url: string) => {
+///// INITIALIZATION
+const initialize = async (url: string) => {
     isInit = true;
     // setup canvas
     const canvas = document.querySelector<HTMLCanvasElement>('#screen')!;
@@ -317,7 +367,6 @@ const init = async (url: string) => {
         parent.style.width = w + "px";
     }
 
-
     // init wasm
     const romData = await fetchRom(url);
     const wasm = await initWasm();
@@ -328,7 +377,7 @@ const init = async (url: string) => {
     nes = NES.new_nes(romData);
     (window as any).nes = nes;
 
-    // setup controls
+    // init controls
     const handleInput = (event: KeyboardEvent, pressed: boolean) => {
         if (event.key in keyMap) {
             event.preventDefault();
@@ -350,72 +399,23 @@ const init = async (url: string) => {
         context.putImageData(imageData, 0, 0);
     }
 
-    onSample = (e: AudioProcessingEvent) => {
-        nes.load_audio_buffer(e.outputBuffer.getChannelData(0));
-    }
+    onSample = (e: AudioProcessingEvent) => nes.load_audio_buffer(e.outputBuffer.getChannelData(0));
 
-    onRomChange = (romData: Uint8Array) => {
-        nes.change_rom(romData);
-    }
+
+    onRomChange = (romData: Uint8Array) => nes.change_rom(romData);
+
 
     let cleanup = setupEventListeners();
+
     window.onbeforeunload = async () => {
         await destroy();
         cleanup();
     }
 }
 
-function scale(element: HTMLElement) {
-    const scale = Math.min(window.innerWidth / SCREEN_WIDTH, window.innerHeight / SCREEN_HEIGHT, 3);
-    let w = (SCREEN_WIDTH * scale) - 10;
-    element.style.width = w + "px";
-}
-
 const main = async () => {
-    let saveButton = document.getElementById('save')!;
-    let loadButton = document.getElementById('load')!;
-    saveButton.onclick = save;
-    loadButton.onclick = load;
-    ///
-    const canvas = document.getElementById('screen')! as HTMLCanvasElement;
-    document.getElementById('downloadBtn')!.addEventListener('click', () => {
-        const scaleFactor = 2;
-        const offScreenCanvas = document.createElement('canvas')!;
-        const offScreenContext = offScreenCanvas.getContext('2d')!;
-        offScreenCanvas.width = canvas.width * scaleFactor;
-        offScreenCanvas.height = canvas.height * scaleFactor;
-        offScreenCanvas.style.imageRendering = "pixelated";
-        offScreenContext.imageSmoothingEnabled = false;
-        offScreenContext.drawImage(
-            canvas,
-            0, 0,
-            canvas.width, canvas.height,
-            0, 0,
-            offScreenCanvas.width, offScreenCanvas.height
-        );
-
-        const dataURL = offScreenCanvas.toDataURL('image/png');
-        const link = document.createElement('a');
-        link.href = dataURL;
-        link.download = 'canvas-image.png';
-        link.click();
-    });
-    await init('roms/mario.nes');
+    await initialize('roms/mario.nes');
     startVideo();
-}
-
-let save_buffer: Uint8Array;
-
-const save = () => {
-    save_buffer = nes.get_state();
-}
-
-const load = () => {
-    try {
-        nes.set_state(save_buffer);
-    } catch (error) {
-        console.log(error);
-    }
 }
 
 document.addEventListener('DOMContentLoaded', main);
