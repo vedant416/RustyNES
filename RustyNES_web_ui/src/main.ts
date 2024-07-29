@@ -216,25 +216,24 @@ const destroy = async () => {
 };
 
 ///// EVENT HANDLERS
-let playButton = document.getElementById('play')!;
-let pauseButton = document.getElementById('pause')!;
-let mute = document.getElementById('mute')!;
-let li = document.getElementsByClassName('rom') as HTMLCollectionOf<HTMLLIElement>;
-let liList = Array.from(li);
-
-let aBtn = document.getElementById('a')!;
-let bBtn = document.getElementById('b')!;
-let selectBtn = document.getElementById('select')!;
-let startBtn = document.getElementById('start')!;
-let upBtn = document.getElementById('up')!;
-let downBtn = document.getElementById('down')!;
-let leftBtn = document.getElementById('left')!;
-let rightBtn = document.getElementById('right')!;
-let btnList = [aBtn, bBtn, selectBtn, startBtn, upBtn, downBtn, leftBtn, rightBtn];
 
 const setupEventListeners = () => {
-    window.addEventListener('keydown', onPress);
-    window.addEventListener('keyup', onLift);
+    let playButton = document.getElementById('play')!;
+    let pauseButton = document.getElementById('pause')!;
+    let mute = document.getElementById('mute')!;
+    let li = document.getElementsByClassName('rom') as HTMLCollectionOf<HTMLLIElement>;
+    let liList = Array.from(li);
+
+    let aBtn = document.getElementById('a')!;
+    let bBtn = document.getElementById('b')!;
+    let selectBtn = document.getElementById('select')!;
+    let startBtn = document.getElementById('start')!;
+    let upBtn = document.getElementById('up')!;
+    let downBtn = document.getElementById('down')!;
+    let leftBtn = document.getElementById('left')!;
+    let rightBtn = document.getElementById('right')!;
+    let btnList = [aBtn, bBtn, selectBtn, startBtn, upBtn, downBtn, leftBtn, rightBtn];
+
     playButton.onclick = start;
     pauseButton.onclick = stop;
     mute.onclick = toggleMute;
@@ -262,23 +261,36 @@ const setupEventListeners = () => {
     btnList.forEach((btn, index) => {
         addTouchListeners(btn, index);
     });
+
+    window.addEventListener('keydown', onPress);
+    window.addEventListener('keyup', onLift);
+    window.onblur = () => stop();
+    window.onfocus = () => start();
+
+    const cleanupEventListeners = () => {
+        window.removeEventListener('keydown', onPress);
+        window.removeEventListener('keyup', onLift);
+        window.onblur = null;
+        window.onfocus = null;
+        window.onresize = null;
+
+        playButton.onclick = null;
+        pauseButton.onclick = null;
+        mute.onclick = null;
+
+        liList.forEach((li) => {
+            li.onclick = null;
+        });
+
+        btnList.forEach((btn) => {
+            btn.ontouchstart = null;
+            btn.ontouchend = null;
+        });
+    }
+
+    return cleanupEventListeners;
 }
 
-const cleanupEventListeners = () => {
-    window.removeEventListener('keydown', onPress);
-    window.removeEventListener('keyup', onLift);
-    window.onresize = null;
-    playButton.onclick = null;
-    pauseButton.onclick = null;
-    mute.onclick = null;
-    liList.forEach((li) => {
-        li.onclick = null;
-    });
-    btnList.forEach((btn) => {
-        btn.ontouchstart = null;
-        btn.ontouchend = null;
-    });
-}
 
 const changeRom = async (url: string) => {
     await stop();
@@ -346,7 +358,11 @@ const init = async (url: string) => {
         nes.change_rom(romData);
     }
 
-    setupEventListeners();
+    let cleanup = setupEventListeners();
+    window.onbeforeunload = async () => {
+        await destroy();
+        cleanup();
+    }
 }
 
 function scale(element: HTMLElement) {
