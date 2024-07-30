@@ -301,7 +301,7 @@ li {
 /* ============== INFO ============= */
 .info {
   max-width: 650px;
-  font-size: 1.15rem;
+  font-size: 1.25rem;
   line-height: 1.2;
   padding-inline: 4px;
 }
@@ -341,11 +341,11 @@ table,
 th,
 td {
   border: solid 1px white;
-  padding: 5px;
+  padding: 6px;
   text-align: center;
 }
 
 table {
   border-collapse: collapse;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
 }
