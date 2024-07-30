@@ -8,44 +8,44 @@
   </head>
 
   <body>
-    <div class="stats"></div>
-    <div id="canvas-container">
-      <canvas id="screen" width="256" height="240"></canvas>
-    </div>
-    <hr class="divider" />
-    <!--  -->
-    <div class="keyboard">
-      <div class="top-keys">
-        <div class="arrow-c">
-          <div class="arrow">
-            <div class="arrow-top">
-              <div class="key up" id="up">▲</div>
+    <div class="split">
+      <div class="part1">
+        <div id="canvas-container">
+          <canvas id="screen" width="256" height="240"></canvas>
+        </div>
+        <hr class="divider kbd" />
+        <div class="keyboard">
+          <div class="top-keys">
+            <div class="arrow-c">
+              <div class="arrow">
+                <div class="arrow-top">
+                  <div class="key up" id="up">▲</div>
+                </div>
+                <div class="arrow-mid">
+                  <div class="key left" id="left">◀</div>
+                  <div class="key right" id="right">▶</div>
+                </div>
+                <div class="arrow-bottom">
+                  <div class="key down" id="down">▼</div>
+                </div>
+              </div>
             </div>
-            <div class="arrow-mid">
-              <div class="key left" id="left">◀</div>
-              <div class="key right" id="right">▶</div>
-            </div>
-            <div class="arrow-bottom">
-              <div class="key down" id="down">▼</div>
+
+            <div class="ab">
+              <div class="key b" id="b">B</div>
+              <div class="key a" id="a">A</div>
             </div>
           </div>
+          <div class="bottom-keys">
+            <div class="key select" id="select">SELECT</div>
+            <div class="key start" id="start">START</div>
+          </div>
         </div>
-
-        <div class="ab">
-          <div class="key b" id="b">B</div>
-          <div class="key a" id="a">A</div>
-        </div>
+        <hr class="divider kbd" />
       </div>
-      <div class="bottom-keys">
-        <div class="key select" id="select">SELECT</div>
-        <div class="key start" id="start">START</div>
-      </div>
-    </div>
-    <hr class="divider" />
-    <div class="controls">
-      <div class="flex-col" style="font-size: 1.5rem">
-        <p>Controls</p>
-        <ul class="flex-row" style="font-size: 0.7em">
+      <div class="part2">
+        <div class="section-title">Controls</div>
+        <ul class="controls-list">
           <li id="play">Start Emulator</li>
           <li id="pause">Stop Emulator</li>
           <li id="mute">Toggle Mute</li>
@@ -53,72 +53,97 @@
           <li id="load">Load Game</li>
           <li id="downloadBtn">Download Image</li>
         </ul>
+
         <hr class="divider" />
-        <p style="font-size: 1em">Click on game title to run</p>
-        <ul class="flex-col" style="font-size: 0.7em">
+        <div class="section-title">Click on game title to run</div>
+        <ul class="rom-list">
           <li class="rom" data-name="mario">Super Mario Bros</li>
           <li class="rom" data-name="mario3">Super Mario Bros 3</li>
           <li class="rom" data-name="contra">Contra</li>
           <li class="rom" data-name="alter_ego">Alter Ego</li>
         </ul>
+
+        <hr class="divider" />
+        <div class="section-title"><span>RustyNES</span></div>
+        <div class="info">
+          <a href="https://github.com/vedant416/RustyNES">RustyNES</a> is a NES
+          emulator written in <span>Rust</span>.
+
+          <div class="space"></div>
+          It is <span>written from scratch</span> without using any external
+          libraries.
+
+          <div class="space"></div>
+          This is a web interface for the emulator running in the browser using
+          <span>WebAssembly</span>.
+
+          <div class="space"></div>
+          Click on the toggle mute button to enable sound.
+
+          <div class="space"></div>
+          For best experience set refresh rate to 60Hz.
+
+          <div class="space"></div>
+          Otherwise sound will not be clear.
+
+          <div class="space"></div>
+          View the source code on GitHub:
+          <a class="source" href="https://github.com/vedant416/RustyNES">
+            Source Code
+          </a>
+
+          <div class="space"></div>
+          Website is currently under development.
+        </div>
+
+        <hr class="divider" />
+        <div class="section-title">Keyboard Mappings</div>
+        <div class="table">
+          <table>
+            <thead>
+              <tr>
+                <th>NES Button</th>
+                <th>Keyboard Key</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Up</td>
+                <td>W</td>
+              </tr>
+              <tr>
+                <td>Left</td>
+                <td>A</td>
+              </tr>
+              <tr>
+                <td>Down</td>
+                <td>S</td>
+              </tr>
+              <tr>
+                <td>Right</td>
+                <td>D</td>
+              </tr>
+              <tr>
+                <td>A</td>
+                <td>L</td>
+              </tr>
+              <tr>
+                <td>B</td>
+                <td>K</td>
+              </tr>
+              <tr>
+                <td>Start</td>
+                <td>Enter</td>
+              </tr>
+              <tr>
+                <td>Right Shift</td>
+                <td>Select</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
-
-    <hr class="divider" />
-
-    <p class="info">
-      Website is currently under development. <br />
-      For best experience set refresh rate to 60Hz. Otherwise sound will not be
-      clear.
-    </p>
-    <a class="source" href="https://github.com/vedant416/RustyNES">
-      Source Code
-    </a>
-
-    <hr style="width: 100%; color: white; margin-block: 20px" />
-
-    <table>
-      <thead>
-        <tr>
-          <th>NES Button</th>
-          <th>Keyboard Key</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Up</td>
-          <td>W</td>
-        </tr>
-        <tr>
-          <td>Left</td>
-          <td>A</td>
-        </tr>
-        <tr>
-          <td>Down</td>
-          <td>S</td>
-        </tr>
-        <tr>
-          <td>Right</td>
-          <td>D</td>
-        </tr>
-        <tr>
-          <td>A</td>
-          <td>L</td>
-        </tr>
-        <tr>
-          <td>B</td>
-          <td>K</td>
-        </tr>
-        <tr>
-          <td>Start</td>
-          <td>Enter</td>
-        </tr>
-        <tr>
-          <td>Right Shift</td>
-          <td>Select</td>
-        </tr>
-      </tbody>
-    </table>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

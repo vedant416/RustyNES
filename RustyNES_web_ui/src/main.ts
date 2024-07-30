@@ -32,7 +32,7 @@ let nes: NES;
 let wasmMemory: WebAssembly.Memory;
 
 let isInit: boolean = false;
-let statsAdded = false;
+let statsAdded = true;
 let stats1: Stats;
 let stats2: Stats;
 
@@ -50,11 +50,11 @@ const setupVideo = () => {
     let _prev = prev;
     let _delta = 0;
     const loop = (now: number) => {
-        /////
-        stats1.begin();
-        stats2.begin();
+        ///// For stats
+        // stats1.begin();
+        // stats2.begin();
 
-        /////
+        ///// Throttle to 60 fps
         videoContext = requestAnimationFrame(loop);
         delta = now - prev;
         if (delta < requiredDelta) {
@@ -75,11 +75,12 @@ const setupVideo = () => {
             totalFrames = 0;
             totalTime = 0;
         }
-        ////
 
-        /////////////////////////////////
-        stats1.end();
-        stats2.end();
+
+        ///// For stats
+        // stats1.end();
+        // stats2.end();
+
 
     }
     loop(prev)
@@ -113,7 +114,6 @@ const stopVideo = () => {
     if (isVideoPlaying) {
         isVideoPlaying = false;
         console.log("video stopped");
-
         if (videoContext) {
             cancelAnimationFrame(videoContext);
             videoContext = null;
@@ -406,11 +406,6 @@ const initialize = async (url: string) => {
 
 
     let cleanup = setupEventListeners();
-
-    window.onbeforeunload = async () => {
-        await destroy();
-        cleanup();
-    }
 }
 
 const main = async () => {

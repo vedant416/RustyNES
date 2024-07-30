@@ -17,14 +17,11 @@
 body {
   margin: 0;
   padding: 8px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
   background-color: #2b4d5c;
   color: white;
+  min-width: 350px;
 }
-
 
 /* ============== KEYS ============= */
 .keyboard {
@@ -71,7 +68,6 @@ body {
   justify-content: center;
   align-items: center;
 }
-
 
 .arrow-mid {
   width: 100%;
@@ -178,39 +174,36 @@ canvas {
 
 .keyboard {
   margin-block: 8px;
-  max-width: 650px;
+  max-width: 700px;
 }
 
-body {
-  min-width: 350px;
-  padding: 8px;
+.divider.kbd {
+  margin-block: 12px;
+  max-width: 850px;
 }
 
-hr {
-  max-width: 660px;
-}
-
+/* ============== CANVAS ============= */
 #canvas-container {
   min-width: 256px;
   min-height: 240px;
   padding: 6px;
   border: 3px solid #58b09c;
   background-color: rgba(0, 0, 0, 0.8);
-}
-
-#screen {
-  image-rendering: pixelated;
-  width: 100%;
-}
-#screen,
-#canvas-container {
+  margin-inline: auto;
   font-size: 0;
   border-radius: 4px;
 }
 
+#screen {
+  font-size: 0;
+  border-radius: 4px;
+  image-rendering: pixelated;
+  width: 100%;
+}
+
 .stats {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   gap: 8px;
   margin-bottom: 3px;
@@ -221,87 +214,138 @@ hr {
   border-radius: 4px;
 }
 
-.button-container {
+.split {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 5px;
-  margin: 5px;
 }
 
-.button-container button {
-  padding: 5px;
-  margin: 5px;
-  border: 1px solid black;
-  border-radius: 5px;
-  cursor: pointer;
+#canvas-container {
+  margin-bottom: 20px;
 }
 
-table,
-th,
-td {
-  border: solid 1px white;
-  padding: 10px;
+.part1 {
+  margin-top: 18px;
 }
 
-table {
-  border-collapse: collapse;
-  caption-side: bottom;
-  font-size: 1.5rem;
-  margin-block: 15px;
+/* on desktop */
+@media (min-width: 1024px) {
+  .split {
+    flex-direction: row;
+    gap: 1rem;
+    margin-inline: 1rem;
+  }
+
+  #canvas-container {
+    max-width: 100%;
+    margin-bottom: 20px;
+  }
+  .part1 {
+    width: 70%;
+    margin-top: 1rem;
+  }
+
+  .part2 {
+    max-width: 100%;
+    margin-top: 1rem;
+  }
 }
 
-.flex-col {
-  margin-top: 4px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+/* ============== PART 2 ============= */
+.section-title {
+  font-size: 1.6rem;
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+
+.divider {
   width: 100%;
-  margin-inline: auto;
+  color: white;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.flex-row {
-  margin-top: 4px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: row;
-  flex-wrap: wrap;
-  margin-inline: auto;
-}
-
+/* ============== LIST ============= */
 ul {
   list-style-type: none;
-  padding: 0;
-  margin: 0;
-  margin-right: 20px;
 }
 
 li {
   cursor: pointer;
-  padding: 5px;
+  padding: 4px;
   margin: 5px;
   border: 1px solid black;
   border-radius: 5px;
   background-color: #4f6d7a;
 }
 
-.info {
-  font-size: 1.5rem;
-  max-width: 650px;
-  text-align: center;
+.controls-list,
+.rom-list {
+  font-size: 1.15rem;
 }
 
-.divider {
-  width: 100%;
+.controls-list {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: center;
+  gap: 5px;
+}
+
+.controls-list li {
+  margin: 0;
+}
+
+/* ============== INFO ============= */
+.info {
+  max-width: 650px;
+  font-size: 1.2rem;
+  line-height: 1.2;
+  padding-inline: 4px;
+}
+
+.info span {
+  border-bottom: 3px dotted white;
+}
+.info a {
   color: white;
-  margin-block: 15px;
+  font-size: 1.23rem;
+  border-bottom: 3px dotted white;
+  text-decoration: none;
 }
 
 .source {
   color: white;
-  font-size: 1.5rem;
+  font-size: 1.23rem;
   border-bottom: 3px dotted white;
   text-decoration: none;
+}
+
+.space {
+  margin-block: 8px;
+}
+
+/* ============== TABLE ============= */
+.table {
+  padding-inline: 4px;
+}
+
+table {
+  width: 100%;
+  margin-inline: auto;
+}
+
+table,
+th,
+td {
+  border: solid 1px white;
+  padding: 5px;
+  text-align: center;
+}
+
+table {
+  border-collapse: collapse;
+  font-size: 1.2rem;
 }

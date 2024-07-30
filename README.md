@@ -43,7 +43,7 @@ Try online in your browser: [RustyNES](https://vedant416.github.io/RustyNES/). (
 ### NES Controller keybindings
 
 | Emulator Button | Keyboard Key           |
-| --------------- | ---------------------- |
+|-----------------|------------------------|
 | Up              | <kbd>W</kbd>           |
 | Left            | <kbd>A</kbd>           |
 | Down            | <kbd>S</kbd>           |
@@ -68,7 +68,7 @@ In most games:
 
 
 | Action              | Key          |
-| ------------------- | ------------ |
+|---------------------|--------------|
 | Save emulator state | <kbd>N</kbd> |
 | Load emulator state | <kbd>M</kbd> |
 
