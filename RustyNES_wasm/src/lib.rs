@@ -4,7 +4,6 @@ use rusty_nes_core::SAMPLE_RATE;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
-
 pub struct NES {
     cpu: CPU,
 }
@@ -71,7 +70,6 @@ extern "C" {
     fn add(a: u32, b: u32) -> u32;
     fn throw_js_error();
 }
-
 
 #[wasm_bindgen]
 extern "C" {
