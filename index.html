@@ -4,17 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RustyNES</title>
-    <script type="module" crossorigin src="/RustyNES/assets/index-DSwLNiiK.js"></script>
-    <link rel="stylesheet" crossorigin href="/RustyNES/assets/index-BawX75iW.css">
+    <script type="module" crossorigin src="/RustyNES/assets/index-Ta-Cl8id.js"></script>
+    <link rel="stylesheet" crossorigin href="/RustyNES/assets/index-DUvNMKYm.css">
   </head>
 
   <body>
+    <!-- SPLITS THE CANVAS AND CONTROLS -->
     <div class="split">
+      <!-- part1: canvas and keyboard -->
       <div class="part1">
+        <!-- CANVAS -->
         <div id="canvas-container">
           <canvas id="screen" width="256" height="240"></canvas>
         </div>
+
         <hr class="divider kbd" />
+
+        <!-- KEYBOARD -->
         <div class="keyboard">
           <div class="top-keys">
             <div class="arrow-c">
@@ -42,9 +48,13 @@
             <div class="key start" id="start">START</div>
           </div>
         </div>
+
         <hr class="divider kbd" />
       </div>
+
+      <!-- part2: controls and info -->
       <div class="part2">
+        <!-- CONTROLS -->
         <div class="section-title">Controls</div>
         <ul class="controls-list">
           <li id="play">Start Emulator</li>
@@ -56,6 +66,8 @@
         </ul>
 
         <hr class="divider" />
+
+        <!-- ROM LIST -->
         <div class="section-title">Click on game title to run</div>
         <ul class="rom-list">
           <li class="rom" data-name="mario">Super Mario Bros</li>
@@ -65,39 +77,48 @@
         </ul>
 
         <hr class="divider" />
+
+        <!-- INFO -->
         <div class="section-title"><span>RustyNES</span></div>
         <div class="info">
-          <a href="https://github.com/vedant416/RustyNES">RustyNES</a> is a NES
-          emulator written in <span>Rust</span>.
+          <div class="space">
+            <a href="https://github.com/vedant416/RustyNES">RustyNES</a> is a
+            NES emulator written in <span>Rust</span>.
+          </div>
 
-          <div class="space"></div>
-          It is <span>written from scratch</span> without using any external
-          libraries.
+          <div class="space">
+            It is <span>written from scratch</span> without using any external
+            libraries.
+          </div>
 
-          <div class="space"></div>
-          This is a web interface for the emulator running in the browser using
-          <span>WebAssembly</span>.
+          <div class="space">
+            This is a web interface for the emulator running in the browser
+            using <span>WebAssembly</span>.
+          </div>
 
-          <div class="space"></div>
-          Click on the toggle mute button to enable sound.
+          <div class="space">
+            Click on the toggle mute button to enable sound.
+          </div>
 
-          <div class="space"></div>
-          For best experience set refresh rate to 60Hz.
+          <div class="space">For best experience set refresh rate to 60Hz.</div>
 
-          <div class="space"></div>
-          Otherwise sound will not be clear.
+          <div class="space">Otherwise sound will not be clear.</div>
 
-          <div class="space"></div>
-          View the source code on GitHub:
-          <a class="source" href="https://github.com/vedant416/RustyNES">
-            Source Code
-          </a>
+          <div class="space">
+            View the source code on GitHub:
+            <a class="source" href="https://github.com/vedant416/RustyNES">
+              Source Code
+            </a>
+          </div>
 
-          <div class="space"></div>
-          Website is currently under development.
+          <div class="space">
+            <em>Website is currently under development.</em>
+          </div>
         </div>
 
         <hr class="divider" />
+
+        <!-- TABLE -->
         <div class="section-title">Keyboard Mappings</div>
         <div class="table">
           <table>
