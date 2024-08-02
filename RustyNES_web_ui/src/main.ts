@@ -261,6 +261,7 @@ const downloadImg = () => {
 
 ///// EVENT HANDLING
 const setupEventListeners = () => {
+    // Controls
     let playButton = document.getElementById("play")!;
     let pauseButton = document.getElementById("pause")!;
     let mute = document.getElementById("mute")!;
@@ -275,6 +276,20 @@ const setupEventListeners = () => {
     loadButton.onclick = loadState;
     downloadBtn.onclick = downloadImg;
 
+    // ROMs
+    let liList = document.getElementsByClassName(
+        "rom"
+    ) as HTMLCollectionOf<HTMLLIElement>;
+    let romList = Array.from(liList);
+
+    romList.forEach((li) => {
+        li.onclick = async (e) => {
+            let url = li.getAttribute("data-name")!;
+            changeRom(`roms/${url}.nes`);
+        };
+    });
+
+    // Keyboard
     let aBtn = document.getElementById("a")!;
     let bBtn = document.getElementById("b")!;
     let selectBtn = document.getElementById("select")!;
@@ -283,7 +298,7 @@ const setupEventListeners = () => {
     let downBtn = document.getElementById("down")!;
     let leftBtn = document.getElementById("left")!;
     let rightBtn = document.getElementById("right")!;
-    let btnList = [
+    let keys = [
         aBtn,
         bBtn,
         selectBtn,
@@ -294,37 +309,48 @@ const setupEventListeners = () => {
         rightBtn,
     ];
 
-    let li = document.getElementsByClassName(
-        "rom"
-    ) as HTMLCollectionOf<HTMLLIElement>;
-    let liList = Array.from(li);
-
-    liList.forEach((li) => {
-        li.onclick = async (e) => {
-            let url = li.getAttribute("data-name")!;
-            changeRom(`roms/${url}.nes`);
-        };
-    });
-
-    const addTouchListeners = (element: HTMLElement, key: number) => {
-        element.ontouchstart = () => {
-            element.classList.toggle("pressed");
+    const addKeyboardListeners = (e: HTMLElement, key: number) => {
+        // touch listeners
+        e.ontouchstart = () => {
+            e.classList.toggle("pressed");
             navigator.vibrate(70);
             nes.update_button(key, true);
         };
 
-        element.ontouchend = () => {
-            element.classList.toggle("pressed");
+        e.ontouchend = () => {
+            e.classList.toggle("pressed");
+            nes.update_button(key, false);
+        };
+
+        e.ontouchcancel = () => {
+            e.classList.remove("pressed");
+            nes.update_button(key, false);
+        };
+
+        // mouse listeners
+        e.onmousedown = () => {
+            e.classList.toggle("pressed");
+            nes.update_button(key, true);
+        };
+
+        e.onmouseup = () => {
+            e.classList.toggle("pressed");
+            nes.update_button(key, false);
+        };
+
+        e.onmouseleave = () => {
+            e.classList.remove("pressed");
             nes.update_button(key, false);
         };
     };
 
-    btnList.forEach((btn, index) => {
-        addTouchListeners(btn, index);
+    keys.forEach((btn, index) => {
+        addKeyboardListeners(btn, index);
     });
 
     window.addEventListener("keydown", onPress);
     window.addEventListener("keyup", onLift);
+    // Pause on blur and resume on focus
     window.onblur = () => stop();
     window.onfocus = () => start();
 
@@ -335,19 +361,25 @@ const setupEventListeners = () => {
         window.onfocus = null;
         window.onresize = null;
 
+        mute.onclick = null;
         playButton.onclick = null;
         pauseButton.onclick = null;
-        mute.onclick = null;
         saveButton.onclick = null;
         loadButton.onclick = null;
 
-        liList.forEach((li) => {
+        romList.forEach((li) => {
             li.onclick = null;
         });
 
-        btnList.forEach((btn) => {
+        keys.forEach((btn) => {
+            // touch listeners
             btn.ontouchstart = null;
             btn.ontouchend = null;
+            btn.ontouchcancel = null;
+            // mouse listeners
+            btn.onmousedown = null;
+            btn.onmouseup = null;
+            btn.onmouseleave = null;
         });
     };
 
@@ -364,19 +396,17 @@ const initialize = async (url: string) => {
 
     const scale = Math.min(
         window.innerWidth / SCREEN_WIDTH,
-        window.innerHeight / SCREEN_HEIGHT,
-        3
+        window.innerHeight / SCREEN_HEIGHT
     );
-    let w = (SCREEN_WIDTH - 10) * scale;
+    let w = (SCREEN_WIDTH - 5) * scale;
     parent.style.width = w + "px";
 
     window.onresize = () => {
         const scale = Math.min(
             window.innerWidth / SCREEN_WIDTH,
-            window.innerHeight / SCREEN_HEIGHT,
-            3
+            window.innerHeight / SCREEN_HEIGHT
         );
-        let w = (SCREEN_WIDTH - 10) * scale;
+        let w = (SCREEN_WIDTH - 5) * scale;
         parent.style.width = w + "px";
     };
 

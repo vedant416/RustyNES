@@ -186,6 +186,7 @@ canvas {
 #canvas-container {
   min-width: 256px;
   min-height: 240px;
+  max-width: 100%;
   padding: 6px;
   border: 3px solid #58b09c;
   background-color: rgba(0, 0, 0, 0.8);
