@@ -8,11 +8,11 @@ Written from scratch in `Rust` `without using any external libraries.`
 
 Runs using very low cpu and memory resources at `stable 60fps`.
 
-Supports all 5 channels of `audio`.
+Supports all 5 channels of `NES audio`.
 
 Supports `save state` and `load state`, so that we can resume the game from where we left.
 
-Can run classic NES games like `Super Mario Bros`, `Super Mario Bros 2`, `Super Mario Bros 3`, `Contra`, and many more.
+Can run classic NES games like `Super Mario Bros`, `Super Mario Bros 2`, `Super Mario Bros 3`, `Contra` and many more.
 
 ---
 
@@ -77,11 +77,11 @@ tokei -C -t=Rust,TYPESCRIPT,HTML,CSS -s=lines
 
 ### In most games, the following keybindings are used:
 
-- `Start`: Starts the game or pauses it when running.
-
 - `A`: Used for jumping.
 
 - `B`: Used for shooting.
+
+- `Start`: Starts the game or pauses it when running.
 
 - `Select`: Selects the next option in the menu.
 
