@@ -52,7 +52,7 @@ Try online in your browser: [RustyNES](https://vedant416.github.io/RustyNES/)
 Generated using the [tokei](https://github.com/XAMPPRocky/tokei)
 CLI tool.
 
-Command was used to generate the statistics:
+Command used to generate the statistics:
 
 ```bash
 tokei -C -t=Rust,TYPESCRIPT,HTML,CSS -s=lines
