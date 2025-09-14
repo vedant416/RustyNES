@@ -23,19 +23,13 @@ Try online in your browser: [RustyNES](https://vedant416.github.io/RustyNES/)
 
 ## Screenshots
 
-### `Super Mario Bros` running in `browser` using `WASM`
+### `Super Mario Bros`
 
 <p>
+  <img src="screenshots/image5.png" width="430">
   <img src="screenshots/image3.jpeg" width="250">
-  <img src="screenshots/image4.png" height="400">
+  <img src="screenshots/image4.png" height="380">
 </p>
-
-### `Super Mario Bros` running on `Windows`
-
-<p>
-  <img src="screenshots/image5.png" width="250">
-</p>
-
 
 ## Project Statistics
 
@@ -239,3 +233,4 @@ The `RustyNES_core` library crate has zero dependencies, but `RustyNES_cli` uses
 - [scottferg/Fergulator](https://github.com/scottferg/Fergulator/)
 - [ltriant/nes](https://github.com/ltriant/nes)
 - [spieglt/nestur](https://github.com/spieglt/nestur)
+
