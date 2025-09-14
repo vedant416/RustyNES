@@ -23,19 +23,19 @@ Try online in your browser: [RustyNES](https://vedant416.github.io/RustyNES/)
 
 ## Screenshots
 
-### Super Mario Bros.
+### `Super Mario Bros` running in `browser` using `WASM`
 
-<img src="screenshots/image1.png" width=250> <img src="screenshots/image2.png" width=250>
+<p>
+  <img src="screenshots/image3.jpeg" width="250">
+  <img src="screenshots/image4.png" height="400">
+</p>
 
-## Project Structure
+### `Super Mario Bros` running on `Windows`
 
-- `RustyNES_core`: This is the heart of the emulator, containing the core emulation logic.
+<p>
+  <img src="screenshots/image5.png" width="250">
+</p>
 
-- `RustyNES_cli`: This is a command-line interface that uses `RustyNES_core` and `SDL2` for rendering output, outputting audio, and handling input.
-
-- `RustyNES_wasm`: This crate compiles `RustyNES_core` to WebAssembly which is used by the `RustyNES_web_ui`.
-
-- `RustyNES_web_ui`: This is a web interface that uses `RustyNES_wasm` to run the emulator in a web browser.
 
 ## Project Statistics
 
@@ -57,6 +57,17 @@ Command used to generate the statistics:
 ```bash
 tokei -C -t=Rust,TYPESCRIPT,HTML,CSS -s=lines
 ```
+
+
+## Project Structure
+
+- `RustyNES_core`: This is the heart of the emulator, containing the core emulation logic.
+
+- `RustyNES_cli`: This is a command-line interface that uses `RustyNES_core` and `SDL2` for rendering output, outputting audio, and handling input.
+
+- `RustyNES_wasm`: This crate compiles `RustyNES_core` to WebAssembly which is used by the `RustyNES_web_ui`.
+
+- `RustyNES_web_ui`: This is a web interface that uses `RustyNES_wasm` to run the emulator in a web browser.
 
 ## Keyboard controls
 
